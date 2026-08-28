@@ -1,0 +1,140 @@
+#!/usr/bin/env bash
+# Install this checkout as the themo.nfl bar widget.
+#
+#   ./install                      # into the center section, then restart the shell
+#   ./install --section right      # place it elsewhere
+#   ./install --team kc
+#   ./install --yes --no-restart   # unattended
+#
+# Only needed when the plugin was copied off a USB stick or unpacked from a
+# tarball. From a git URL, `omarchy plugin add` already does all of this.
+
+set -euo pipefail
+
+PLUGIN_ID="themo.nfl"
+here=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
+
+# Omarchy's own plugin commands hardcode $HOME/.config, so this does too --
+# honouring XDG_CONFIG_HOME here would install to a folder omarchy ignores.
+config_home="$HOME/.config"
+plugins_dir="$config_home/omarchy/plugins"
+dest="$plugins_dir/$PLUGIN_ID"
+shell_json="$config_home/omarchy/shell.json"
+# Deliberately NOT under plugins/: the shell loads every directory in there as
+# a plugin, so a backup sitting next to the original becomes a second plugin
+# claiming the same id, and the stale copy can be the one that wins.
+backup_dir="$config_home/omarchy/nfl/backups"
+
+section="center"
+assume_yes=0
+do_restart=1
+team=""
+
+fail() {
+  echo "install: $*" >&2
+  exit 1
+}
+
+confirm() {
+  (( assume_yes )) && return 0
+  [[ -t 0 && -t 1 ]] || fail "not interactive; pass --yes"
+  local answer
+  read -r -p "$1 [y/N] " answer
+  [[ $answer == [yY]* ]]
+}
+
+while (( $# > 0 )); do
+  case "$1" in
+    --section)  section="${2:-}";  [[ -n $section ]]  || fail "--section needs a value";  shift 2 ;;
+    --team)     team="${2:-}";     [[ -n $team ]]     || fail "--team needs a value";     shift 2 ;;
+    --yes|-y)      assume_yes=1; shift ;;
+    --no-restart)  do_restart=0; shift ;;
+    -h|--help)     sed -n '2,10p' "${BASH_SOURCE[0]}" | sed 's/^# \?//'; exit 0 ;;
+    *)             fail "unknown option: $1" ;;
+  esac
+done
+
+case "$section" in left|center|right) ;; *) fail "--section must be left, center or right" ;; esac
+
+# --- prerequisites -----------------------------------------------------------
+command -v omarchy >/dev/null || fail "'omarchy' not found -- this is not an Omarchy system"
+command -v python3 >/dev/null || fail "'python3' is required by bin/nfl-data"
+command -v jq >/dev/null      || fail "'jq' is required"
+[[ -f $here/manifest.json ]]  || fail "run this from inside the plugin folder"
+
+# --- copy --------------------------------------------------------------------
+if [[ $here == "$dest" ]]; then
+  # Already living in the plugins folder -- a git clone straight into place, or
+  # a re-run. Nothing to copy; just make sure it is enabled and wired up.
+  echo "Already installed at $dest -- skipping the copy"
+elif [[ -e $dest || -L $dest ]]; then
+  confirm "$PLUGIN_ID is already installed at $dest. Replace it?" || fail "aborted"
+  mkdir -p "$backup_dir"
+  backup="$backup_dir/$PLUGIN_ID.$(date +%Y%m%d-%H%M%S)"
+  mv -- "$dest" "$backup"
+  echo "Previous version moved to $backup"
+fi
+
+if [[ $here != "$dest" ]]; then
+  mkdir -p "$plugins_dir"
+  cp -a -- "$here" "$dest"
+  rm -rf -- "$dest/.git"
+fi
+
+# A drive formatted FAT/exFAT, or a download through a browser, drops the
+# execute bit -- and the widget runs these two directly, not through python3.
+chmod +x "$dest"/bin/*
+find "$dest" -name '__pycache__' -type d -prune -exec rm -rf {} + 2>/dev/null || true
+
+omarchy plugin validate "$dest" || fail "the installed plugin does not validate"
+echo "Installed $PLUGIN_ID into $dest"
+
+# --- enable ------------------------------------------------------------------
+already_in_bar=0
+if [[ -f $shell_json ]] && jq -e --arg id "$PLUGIN_ID" \
+  '[.. | objects | select(.id? == $id)] | length > 0' "$shell_json" >/dev/null 2>&1; then
+  already_in_bar=1
+fi
+
+omarchy-shell shell rescanPlugins >/dev/null 2>&1 || true
+
+if (( already_in_bar )); then
+  echo "Already placed in the bar -- leaving shell.json alone"
+elif omarchy plugin enable "$PLUGIN_ID" --section "$section"; then
+  # 'enable' is an IPC call: the running shell is what writes shell.json, and it
+  # does so a moment later. Wait for the entry before touching the file below.
+  for _ in $(seq 40); do
+    jq -e --arg id "$PLUGIN_ID" '[.. | objects | select(.id? == $id)] | length > 0' \
+      "$shell_json" >/dev/null 2>&1 && break
+    sleep 0.05
+  done
+else
+  echo
+  echo "The plugin is installed, but enabling it failed -- that call needs a"
+  echo "running omarchy-shell. Log into the desktop and finish with:"
+  echo "    omarchy plugin enable $PLUGIN_ID --section $section"
+  echo "    omarchy restart shell"
+  exit 1
+fi
+
+# --- optional settings -------------------------------------------------------
+if [[ -n $team ]] && [[ -f $shell_json ]]; then
+  cp -a -- "$shell_json" "$shell_json.bak.$$"
+  tmp=$(mktemp)
+  jq --arg id "$PLUGIN_ID" --arg team "$team" '
+    .bar.layout |= with_entries(.value |= map(
+      if .id == $id then .team = $team else . end))
+  ' "$shell_json" > "$tmp"
+  mv -- "$tmp" "$shell_json"
+  echo "Team set to $team; backup: $shell_json.bak.$$"
+fi
+
+# --- restart -----------------------------------------------------------------
+# A newly enabled bar widget is not instantiated by hot reload alone; the bar
+# has to be rebuilt once. Later edits to the plugin files do hot-reload.
+if (( do_restart )); then
+  omarchy restart shell
+  echo "Shell restarted -- the football icon should be in the $section section now."
+else
+  echo "Skipped the restart. Run 'omarchy restart shell' to make the widget appear."
+fi

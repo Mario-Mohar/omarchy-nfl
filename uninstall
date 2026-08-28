@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+# Remove the themo.nfl bar widget from this machine.
+set -euo pipefail
+
+PLUGIN_ID="themo.nfl"
+dest="$HOME/.config/omarchy/plugins/$PLUGIN_ID"
+
+command -v omarchy >/dev/null || { echo "uninstall: 'omarchy' not found" >&2; exit 1; }
+
+omarchy plugin disable "$PLUGIN_ID" 2>/dev/null || true
+omarchy plugin remove "$PLUGIN_ID" --yes 2>/dev/null || rm -rf -- "$dest"
+# Cached ESPN payloads and the picked team.
+rm -f -- "$HOME"/.local/state/omarchy/nfl-*.json
+omarchy restart shell
+echo "Removed $PLUGIN_ID (plugin folder, bar entry, cached data and picked team)."

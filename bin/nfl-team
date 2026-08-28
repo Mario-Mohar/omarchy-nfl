@@ -1,0 +1,80 @@
+#!/usr/bin/env python3
+"""Read/write the team the NFL widget follows.
+
+The panel's team picker writes here so a chosen team survives restarts without
+the user editing shell.json. The stored value wins over the widget's `team`
+setting; clearing it hands control back to that setting.
+
+Usage: nfl-team [--get] [--set SF] [--clear] [--path]
+"""
+
+import argparse
+import json
+import os
+import re
+import sys
+
+VALID = re.compile(r"^[A-Za-z]{2,4}$")
+
+
+def state_path():
+    base = os.environ.get("XDG_STATE_HOME") or os.path.expanduser("~/.local/state")
+    return os.path.join(base, "omarchy", "nfl-team.json")
+
+
+def read_team():
+    try:
+        with open(state_path(), "r", encoding="utf-8") as fh:
+            data = json.load(fh)
+        team = str((data or {}).get("team") or "").strip().upper()
+        return team if VALID.match(team) else ""
+    except (OSError, ValueError):
+        return ""
+
+
+def write_team(team):
+    path = state_path()
+    os.makedirs(os.path.dirname(path), exist_ok=True)
+    tmp = path + ".tmp"
+    with open(tmp, "w", encoding="utf-8") as fh:
+        json.dump({"team": team.upper()}, fh)
+    os.replace(tmp, path)
+
+
+def clear_team():
+    try:
+        os.remove(state_path())
+    except FileNotFoundError:
+        pass
+
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--get", action="store_true")
+    ap.add_argument("--set", default="")
+    ap.add_argument("--clear", action="store_true")
+    ap.add_argument("--path", action="store_true")
+    args = ap.parse_args()
+
+    if args.path:
+        print(state_path())
+        return 0
+
+    if args.clear:
+        clear_team()
+        return 0
+
+    if args.set:
+        team = args.set.strip()
+        if not VALID.match(team):
+            sys.stderr.write("nfl-team: not a team abbreviation: %s\n" % args.set)
+            return 1
+        write_team(team)
+        return 0
+
+    print(read_team())
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main())

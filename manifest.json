@@ -1,0 +1,151 @@
+{
+  "schemaVersion": 1,
+  "id": "themo.nfl",
+  "name": "NFL",
+  "version": "1.2.0",
+  "author": "themo",
+  "license": "MIT",
+  "description": "Follow an NFL team from the Omarchy bar. One glyph in the bar, and a popup with the full season: next game with a live score while it is on, upcoming fixtures, results, and the division or conference table. Pick your team from a searchable list inside the panel — no config file editing.",
+  "kinds": [
+    "bar-widget"
+  ],
+  "activation": "on-demand",
+  "entryPoints": {
+    "barWidget": "BarWidget.qml"
+  },
+  "barWidget": {
+    "displayName": "NFL",
+    "description": "Schedule, live score, results and standings for any of the 32 NFL teams. Data comes from ESPN's public API; python3 is the only dependency.",
+    "category": "Info",
+    "aliases": [
+      "american football",
+      "espn",
+      "football",
+      "nfl",
+      "schedule",
+      "score",
+      "sport",
+      "standings",
+      "superbowl",
+      "team"
+    ],
+    "allowMultiple": false,
+    "defaultSection": "center",
+    "defaults": {
+      "team": "sf",
+      "barFormat": "icon",
+      "refreshMinutes": 15,
+      "upcomingCount": 6,
+      "resultsCount": 8,
+      "standingsScope": "division",
+      "icon": "",
+      "winColor": "#6f9e5f"
+    },
+    "schema": [
+      {
+        "key": "team",
+        "type": "string",
+        "label": "Team",
+        "defaultValue": "sf",
+        "description": "ESPN team abbreviation, e.g. sf, kc, dal. Only a starting point — picking a team inside the panel overrides this and is what most people should use."
+      },
+      {
+        "key": "barFormat",
+        "type": "enum",
+        "label": "Bar display",
+        "defaultValue": "icon",
+        "description": "What the widget shows in the bar itself. A live game always wins and shows the running score, whichever format is set.",
+        "options": [
+          {
+            "value": "icon",
+            "label": "Icon only",
+            "description": "A single football glyph in the bar's narrow icon slot"
+          },
+          {
+            "value": "short",
+            "label": "Next opponent",
+            "description": "@ LV"
+          },
+          {
+            "value": "next",
+            "label": "Next opponent and kickoff",
+            "description": "@ LV Fri 08/28 02:00"
+          },
+          {
+            "value": "record",
+            "label": "Record",
+            "description": "11-6"
+          },
+          {
+            "value": "last",
+            "label": "Last result",
+            "description": "W 24:17 @ LV"
+          }
+        ]
+      },
+      {
+        "key": "refreshMinutes",
+        "type": "integer",
+        "label": "Refresh every (minutes)",
+        "min": 1,
+        "max": 120,
+        "step": 1,
+        "defaultValue": 15,
+        "description": "How often ESPN is polled. Drops to one minute on its own while a game is live."
+      },
+      {
+        "key": "upcomingCount",
+        "type": "integer",
+        "label": "Upcoming games listed",
+        "min": 0,
+        "max": 25,
+        "step": 1,
+        "defaultValue": 6,
+        "description": "Set to 0 to hide the upcoming section."
+      },
+      {
+        "key": "resultsCount",
+        "type": "integer",
+        "label": "Results listed",
+        "min": 0,
+        "max": 25,
+        "step": 1,
+        "defaultValue": 8,
+        "description": "Newest first. Set to 0 to hide the results section."
+      },
+      {
+        "key": "standingsScope",
+        "type": "enum",
+        "label": "Standings on open",
+        "defaultValue": "division",
+        "description": "Which table the panel starts on. Both are one click apart inside the panel.",
+        "options": [
+          {
+            "value": "division",
+            "label": "Division",
+            "description": "The team's own four-team division"
+          },
+          {
+            "value": "conference",
+            "label": "Conference",
+            "description": "All 16 teams, seeded"
+          }
+        ]
+      },
+      {
+        "key": "icon",
+        "type": "string",
+        "label": "Bar glyph",
+        "defaultValue": "",
+        "description": "The Nerd Font glyph in the bar. Default is nf-fa-football (U+ED69)."
+      },
+      {
+        "key": "winColor",
+        "type": "string",
+        "label": "Win color",
+        "defaultValue": "#6f9e5f",
+        "description": "Color of the W badge on results. Losses use the theme's own urgent color."
+      }
+    ]
+  }
+}
