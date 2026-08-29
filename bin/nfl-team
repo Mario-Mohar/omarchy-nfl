@@ -14,38 +14,61 @@ import os
 import re
 import sys
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import nflcommon  # noqa: E402  (hardened state-directory access)
+
 VALID = re.compile(r"^[A-Za-z]{2,4}$")
+FILENAME = "nfl-team.json"
 
 
 def state_path():
-    base = os.environ.get("XDG_STATE_HOME") or os.path.expanduser("~/.local/state")
-    return os.path.join(base, "omarchy", "nfl-team.json")
+    return os.path.join(nflcommon.state_path(), FILENAME)
 
 
 def read_team():
+    """The stored team, or "" for anything we would not act on.
+
+    Never raises: a missing file, a symlink someone left in the state
+    directory, or a hand-edited mess all mean the same thing here -- fall back
+    to the widget setting rather than take the panel down.
+    """
     try:
-        with open(state_path(), "r", encoding="utf-8") as fh:
-            data = json.load(fh)
+        dir_fd = nflcommon.open_dir(nflcommon.state_path())
+    except OSError:
+        return ""
+    try:
+        raw = nflcommon.read_bounded(dir_fd, FILENAME)
+        if raw is None:
+            return ""
+        data = json.loads(raw.decode("utf-8", "replace"))
         team = str((data or {}).get("team") or "").strip().upper()
         return team if VALID.match(team) else ""
     except (OSError, ValueError):
         return ""
+    finally:
+        os.close(dir_fd)
 
 
 def write_team(team):
-    path = state_path()
-    os.makedirs(os.path.dirname(path), exist_ok=True)
-    tmp = path + ".tmp"
-    with open(tmp, "w", encoding="utf-8") as fh:
-        json.dump({"team": team.upper()}, fh)
-    os.replace(tmp, path)
+    dir_fd = nflcommon.open_dir(nflcommon.state_path(), create=True)
+    try:
+        nflcommon.write_atomic(
+            dir_fd, FILENAME, json.dumps({"team": team.upper()}))
+    finally:
+        os.close(dir_fd)
 
 
 def clear_team():
     try:
-        os.remove(state_path())
-    except FileNotFoundError:
+        dir_fd = nflcommon.open_dir(nflcommon.state_path())
+    except OSError:
+        return
+    try:
+        os.unlink(FILENAME, dir_fd=dir_fd)
+    except (FileNotFoundError, OSError):
         pass
+    finally:
+        os.close(dir_fd)
 
 
 def main():
@@ -69,7 +92,13 @@ def main():
         if not VALID.match(team):
             sys.stderr.write("nfl-team: not a team abbreviation: %s\n" % args.set)
             return 1
-        write_team(team)
+        try:
+            write_team(team)
+        except OSError as exc:
+            # The panel's team picker calls this; a traceback on stderr would
+            # be all it ever saw of the reason.
+            sys.stderr.write("nfl-team: %s\n" % exc)
+            return 1
         return 0
 
     print(read_team())

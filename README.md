@@ -144,6 +144,13 @@ Caches live in `~/.local/state/omarchy/`: `nfl-<team>.json` per team, and
 good payload is served so the popup never goes blank; the picker additionally
 falls back to a roster baked into the script, so it works offline.
 
+That directory is opened once and every read and write happens relative to that
+descriptor, never through a path a second time: the helpers refuse a state
+directory owned by somebody else or writable by others, refuse a symlink where
+a cache file should be, write through randomly named exclusive temporary files
+at mode 600, and cap how much they will read from the network or from the cache
+before parsing it. Files land at `-rw-------`.
+
 Two things worth knowing if you hack on this:
 
 - ESPN answers browser-like User-Agents with `403`. The script identifies as

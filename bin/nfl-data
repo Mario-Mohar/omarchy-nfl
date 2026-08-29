@@ -16,6 +16,9 @@ import time
 import urllib.error
 import urllib.request
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import nflcommon  # noqa: E402  (hardened state-directory access, bounded reads)
+
 SITE = "https://site.api.espn.com/apis/site/v2/sports/football/nfl"
 CORE = "https://site.api.espn.com/apis/v2/sports/football/nfl"
 
@@ -27,6 +30,9 @@ SEASON_TYPES = [
 ]
 
 TIMEOUT = 12
+
+# Matches bin/nfl-team: the abbreviation reaches a URL and a file name.
+TEAM_RE = __import__("re").compile(r"^[a-z]{2,4}$")
 
 # The 32 teams are stable across a season, so the picker falls back to this
 # list whenever the roster endpoint is unreachable. Refreshed from ESPN into
@@ -72,9 +78,13 @@ TEAMS_TTL = 7 * 24 * 3600
 
 def get(url):
     # ESPN 403s unknown and browser-like agents alike; a curl UA is accepted.
+    #
+    # Read through a byte cap rather than json.load()ing the stream: the parser
+    # would happily follow a response that never ends, and whatever it built
+    # goes on to a QML collector that buffers the lot.
     req = urllib.request.Request(url, headers={"User-Agent": "curl/8.7.1"})
     with urllib.request.urlopen(req, timeout=TIMEOUT) as resp:
-        return json.load(resp)
+        return nflcommon.load_json_bounded(resp)
 
 
 def num(stats, name):
@@ -309,26 +319,26 @@ def fetch_teams():
     return [{"abbr": a, "name": n, "short": s} for a, n, s in FALLBACK_TEAMS]
 
 
-def teams_payload(cache, max_age):
-    if max_age > 0 and os.path.exists(cache):
+def teams_payload(dir_fd, name, max_age):
+    if max_age > 0:
         try:
-            if time.time() - os.path.getmtime(cache) < max_age:
-                with open(cache, "r", encoding="utf-8") as fh:
-                    return fh.read()
+            age = nflcommon.age_seconds(dir_fd, name)
+            if age is not None and age < max_age:
+                raw = nflcommon.read_bounded(dir_fd, name)
+                if raw is not None:
+                    return raw.decode("utf-8", "replace")
         except OSError:
             pass
     payload = json.dumps({"teams": fetch_teams()}, separators=(",", ":"))
-    write_cache(cache, payload)
+    write_cache(dir_fd, name, payload)
     return payload
 
 
-def write_cache(cache, payload):
+def write_cache(dir_fd, name, payload):
+    # Best effort: a cache we could not refresh is not worth failing a fetch
+    # over -- the caller already holds the payload it was asked for.
     try:
-        os.makedirs(os.path.dirname(cache), exist_ok=True)
-        tmp = cache + ".tmp"
-        with open(tmp, "w", encoding="utf-8") as fh:
-            fh.write(payload)
-        os.replace(tmp, cache)
+        nflcommon.write_atomic(dir_fd, name, payload)
     except OSError:
         pass
 
@@ -391,48 +401,70 @@ def main():
     ap.add_argument("--no-cache", action="store_true")
     args = ap.parse_args()
 
+    # The abbreviation goes into a URL path and into a cache file name, so it
+    # is checked before either. bin/nfl-team already holds this line; the
+    # `team` widget setting reaches us without passing through it.
     team = args.team.strip().lower() or "sf"
-    state = os.path.join(
-        os.environ.get("XDG_STATE_HOME") or os.path.expanduser("~/.local/state"),
-        "omarchy",
-    )
+    if not TEAM_RE.match(team):
+        sys.stderr.write("nfl-data: not a team abbreviation: %s\n" % args.team)
+        return 2
 
-    if args.teams:
-        # The roster barely changes, so it gets its own long-lived cache
-        # rather than riding along with every schedule refresh.
-        max_age = 0 if args.no_cache else TEAMS_TTL
-        sys.stdout.write(teams_payload(os.path.join(state, "nfl-teams.json"), max_age))
-        return 0
-
-    cache = args.cache or os.path.join(state, "nfl-%s.json" % team)
-
-    if not args.no_cache and args.max_age > 0 and os.path.exists(cache):
-        try:
-            if time.time() - os.path.getmtime(cache) < args.max_age:
-                with open(cache, "r", encoding="utf-8") as fh:
-                    sys.stdout.write(fh.read())
-                return 0
-        except OSError:
-            pass
+    # --cache names a file the caller chose, so its directory is opened and
+    # checked like any other; everything else lives in the state directory.
+    if args.cache:
+        cache_dir = os.path.dirname(os.path.abspath(args.cache)) or "."
+        cache_name = os.path.basename(args.cache)
+        create_dir = False
+    else:
+        cache_dir = nflcommon.state_path()
+        cache_name = "nfl-%s.json" % team
+        create_dir = True
 
     try:
-        payload = json.dumps(build(team), separators=(",", ":"))
-    except Exception as exc:  # noqa: BLE001 - stale cache beats an empty panel
-        if os.path.exists(cache):
-            try:
-                with open(cache, "r", encoding="utf-8") as fh:
-                    sys.stdout.write(fh.read())
-                return 0
-            except OSError:
-                pass
+        dir_fd = nflcommon.open_dir(cache_dir, create=create_dir)
+    except OSError as exc:
         sys.stderr.write("nfl-data: %s\n" % exc)
         return 1
 
-    if not args.no_cache:
-        write_cache(cache, payload)
+    try:
+        if args.teams:
+            # The roster barely changes, so it gets its own long-lived cache
+            # rather than riding along with every schedule refresh.
+            max_age = 0 if args.no_cache else TEAMS_TTL
+            nflcommon.emit(teams_payload(dir_fd, "nfl-teams.json", max_age))
+            return 0
 
-    sys.stdout.write(payload)
-    return 0
+        if not args.no_cache and args.max_age > 0:
+            try:
+                age = nflcommon.age_seconds(dir_fd, cache_name)
+                if age is not None and age < args.max_age:
+                    raw = nflcommon.read_bounded(dir_fd, cache_name)
+                    if raw is not None:
+                        nflcommon.emit(raw.decode("utf-8", "replace"))
+                        return 0
+            except OSError:
+                pass
+
+        try:
+            payload = json.dumps(build(team), separators=(",", ":"))
+        except Exception as exc:  # noqa: BLE001 - stale cache beats an empty panel
+            try:
+                raw = nflcommon.read_bounded(dir_fd, cache_name)
+                if raw is not None:
+                    nflcommon.emit(raw.decode("utf-8", "replace"))
+                    return 0
+            except OSError:
+                pass
+            sys.stderr.write("nfl-data: %s\n" % exc)
+            return 1
+
+        if not args.no_cache:
+            write_cache(dir_fd, cache_name, payload)
+
+        nflcommon.emit(payload)
+        return 0
+    finally:
+        os.close(dir_fd)
 
 
 if __name__ == "__main__":
