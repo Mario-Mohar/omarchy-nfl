@@ -316,11 +316,14 @@ function reversed(list) {
   return out
 }
 
+// A count of 0 hides the section, so it has to be told apart from a missing or
+// unparseable setting -- `!max` would swallow both and hand back the full list.
 function limited(list, count) {
   var items = list || []
   var max = parseInt(count, 10)
-  if (!max || max <= 0 || items.length <= max) return items
-  return items.slice(0, max)
+  if (isNaN(max) || max < 0) return items
+  if (max === 0) return []
+  return items.length <= max ? items : items.slice(0, max)
 }
 
 // ---- Bar label -----------------------------------------------------------
