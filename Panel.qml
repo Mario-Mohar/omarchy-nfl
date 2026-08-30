@@ -368,6 +368,7 @@ Panel {
               spacing: Style.space(10)
 
               Text {
+                textFormat: Text.PlainText
                 anchors.verticalCenter: parent.verticalCenter
                 text: root.icon
                 color: root.bar ? root.bar.foreground : Color.foreground
@@ -390,6 +391,7 @@ Panel {
                   height: root.pickingTeam ? teamField.implicitHeight : teamNameText.implicitHeight
 
                   Text {
+                    textFormat: Text.PlainText
                     id: teamNameText
                     visible: !root.pickingTeam
                     width: parent.width
@@ -441,6 +443,7 @@ Panel {
                 }
 
                 Text {
+                  textFormat: Text.PlainText
                   width: parent.width
                   text: root.pickingTeam
                     ? Model.t("pickerHint")
@@ -462,6 +465,7 @@ Panel {
               spacing: Style.space(2)
 
               Text {
+                textFormat: Text.PlainText
                 anchors.right: parent.right
                 text: root.recordLabel || "—"
                 color: root.bar ? root.bar.foreground : Color.foreground
@@ -470,6 +474,7 @@ Panel {
                 font.bold: true
               }
               Text {
+                textFormat: Text.PlainText
                 anchors.right: parent.right
                 text: Model.t("record")
                 color: Color.muted
@@ -501,6 +506,7 @@ Panel {
                 color: teamRow.current ? Style.selectedFill : "transparent"
 
                 Text {
+                  textFormat: Text.PlainText
                   anchors.left: parent.left
                   anchors.leftMargin: Style.space(8)
                   anchors.verticalCenter: parent.verticalCenter
@@ -513,6 +519,7 @@ Panel {
                 }
 
                 Text {
+                  textFormat: Text.PlainText
                   anchors.left: parent.left
                   anchors.leftMargin: Style.space(58)
                   anchors.right: parent.right
@@ -545,6 +552,7 @@ Panel {
             visible: !root.pickingTeam && !!root.nextGame
 
             Text {
+              textFormat: Text.PlainText
               text: root.live ? Model.t("live") : Model.t("nextGame")
               color: root.live ? root.lossColor : Color.muted
               font.family: root.bar ? root.bar.fontFamily : Style.font.family
@@ -553,6 +561,7 @@ Panel {
             }
 
             Text {
+              textFormat: Text.PlainText
               width: parent.width
               text: root.nextGame ? Model.opponentLongLabel(root.nextGame) : ""
               color: root.bar ? root.bar.foreground : Color.foreground
@@ -563,6 +572,7 @@ Panel {
             }
 
             Text {
+              textFormat: Text.PlainText
               width: parent.width
               text: {
                 if (!root.nextGame) return ""
@@ -583,6 +593,7 @@ Panel {
             }
 
             Text {
+              textFormat: Text.PlainText
               width: parent.width
               text: {
                 if (!root.nextGame) return ""
@@ -628,6 +639,7 @@ Panel {
                 height: Style.space(20)
 
                 Text {
+                  textFormat: Text.PlainText
                   anchors.left: parent.left
                   anchors.verticalCenter: parent.verticalCenter
                   width: Style.space(74)
@@ -639,6 +651,7 @@ Panel {
                 }
 
                 Text {
+                  textFormat: Text.PlainText
                   anchors.left: parent.left
                   anchors.leftMargin: Style.space(78)
                   anchors.verticalCenter: parent.verticalCenter
@@ -654,6 +667,7 @@ Panel {
                 // Late-season kickoffs are flexed, so ESPN reports them as TBD
                 // until the slot is fixed; showing a fake time would lie.
                 Text {
+                  textFormat: Text.PlainText
                   anchors.right: parent.right
                   anchors.verticalCenter: parent.verticalCenter
                   text: String(upcomingRow.modelData.shortDetail) === "TBD"
@@ -697,6 +711,7 @@ Panel {
                 height: Style.space(20)
 
                 Text {
+                  textFormat: Text.PlainText
                   anchors.left: parent.left
                   anchors.verticalCenter: parent.verticalCenter
                   width: Style.space(74)
@@ -708,6 +723,7 @@ Panel {
                 }
 
                 Text {
+                  textFormat: Text.PlainText
                   anchors.left: parent.left
                   anchors.leftMargin: Style.space(78)
                   anchors.verticalCenter: parent.verticalCenter
@@ -721,6 +737,7 @@ Panel {
                 }
 
                 Text {
+                  textFormat: Text.PlainText
                   anchors.left: parent.left
                   anchors.leftMargin: Style.space(178)
                   anchors.verticalCenter: parent.verticalCenter
@@ -736,6 +753,7 @@ Panel {
                   spacing: Style.space(8)
 
                   Text {
+                    textFormat: Text.PlainText
                     anchors.verticalCenter: parent.verticalCenter
                     text: Model.scoreLine(resultRow.modelData)
                     color: root.bar ? root.bar.foreground : Color.foreground
@@ -751,6 +769,7 @@ Panel {
                     color: Qt.rgba(resultRow.badge.r, resultRow.badge.g, resultRow.badge.b, 0.18)
 
                     Text {
+                      textFormat: Text.PlainText
                       anchors.centerIn: parent
                       text: String(resultRow.modelData.result || "-")
                       color: resultRow.badge
@@ -806,6 +825,7 @@ Panel {
                   border.color: scopeTab.active ? Style.selectedBorderColor : "transparent"
 
                   Text {
+                    textFormat: Text.PlainText
                     id: scopeLabel
                     anchors.centerIn: parent
                     text: scopeTab.modelData.label
@@ -833,6 +853,7 @@ Panel {
             visible: !root.pickingTeam && root.standingsRows.length > 0
 
             Text {
+              textFormat: Text.PlainText
               anchors.left: parent.left
               anchors.leftMargin: Style.space(26)
               anchors.verticalCenter: parent.verticalCenter
@@ -848,24 +869,28 @@ Panel {
               spacing: 0
 
               Text {
+                textFormat: Text.PlainText
                 width: Style.space(58); horizontalAlignment: Text.AlignRight
                 text: "W-L"; color: Color.muted
                 font.family: root.bar ? root.bar.fontFamily : Style.font.family
                 font.pixelSize: Style.font.caption
               }
               Text {
+                textFormat: Text.PlainText
                 width: Style.space(50); horizontalAlignment: Text.AlignRight
                 text: "PCT"; color: Color.muted
                 font.family: root.bar ? root.bar.fontFamily : Style.font.family
                 font.pixelSize: Style.font.caption
               }
               Text {
+                textFormat: Text.PlainText
                 width: Style.space(46); horizontalAlignment: Text.AlignRight
                 text: "DIFF"; color: Color.muted
                 font.family: root.bar ? root.bar.fontFamily : Style.font.family
                 font.pixelSize: Style.font.caption
               }
               Text {
+                textFormat: Text.PlainText
                 width: Style.space(40); horizontalAlignment: Text.AlignRight
                 text: "STRK"; color: Color.muted
                 font.family: root.bar ? root.bar.fontFamily : Style.font.family
@@ -902,6 +927,7 @@ Panel {
                 color: standingRow.mine ? Style.selectedFill : "transparent"
 
                 Text {
+                  textFormat: Text.PlainText
                   anchors.left: parent.left
                   anchors.leftMargin: Style.space(4)
                   anchors.verticalCenter: parent.verticalCenter
@@ -913,6 +939,7 @@ Panel {
                 }
 
                 Text {
+                  textFormat: Text.PlainText
                   anchors.left: parent.left
                   anchors.leftMargin: Style.space(26)
                   anchors.verticalCenter: parent.verticalCenter
@@ -924,6 +951,7 @@ Panel {
                 }
 
                 Text {
+                  textFormat: Text.PlainText
                   anchors.left: parent.left
                   anchors.leftMargin: Style.space(64)
                   anchors.right: statsRow.left
@@ -943,6 +971,7 @@ Panel {
                   spacing: 0
 
                   Text {
+                    textFormat: Text.PlainText
                     width: Style.space(58); horizontalAlignment: Text.AlignRight
                     text: String(standingRow.modelData.record)
                     color: root.bar ? root.bar.foreground : Color.foreground
@@ -951,6 +980,7 @@ Panel {
                     font.bold: standingRow.mine
                   }
                   Text {
+                    textFormat: Text.PlainText
                     width: Style.space(50); horizontalAlignment: Text.AlignRight
                     text: String(standingRow.modelData.pct)
                     color: standingRow.secondary
@@ -958,6 +988,7 @@ Panel {
                     font.pixelSize: Style.font.bodySmall
                   }
                   Text {
+                    textFormat: Text.PlainText
                     width: Style.space(46); horizontalAlignment: Text.AlignRight
                     text: String(standingRow.modelData.diff)
                     color: standingRow.secondary
@@ -965,6 +996,7 @@ Panel {
                     font.pixelSize: Style.font.bodySmall
                   }
                   Text {
+                    textFormat: Text.PlainText
                     width: Style.space(40); horizontalAlignment: Text.AlignRight
                     text: String(standingRow.modelData.streak)
                     color: standingRow.secondary
@@ -982,6 +1014,7 @@ Panel {
             height: Style.space(18)
 
             Text {
+              textFormat: Text.PlainText
               anchors.left: parent.left
               anchors.verticalCenter: parent.verticalCenter
               text: root.loading
@@ -995,6 +1028,7 @@ Panel {
             }
 
             Text {
+              textFormat: Text.PlainText
               anchors.right: parent.right
               anchors.verticalCenter: parent.verticalCenter
               text: root.pickingTeam ? "" : Model.t("changeTeam")

@@ -2,7 +2,7 @@
   "schemaVersion": 1,
   "id": "themo.nfl",
   "name": "NFL",
-  "version": "1.3.0",
+  "version": "1.3.1",
   "author": "themo",
   "license": "MIT",
   "description": "Follow an NFL team from the Omarchy bar. One glyph in the bar, and a popup with the full season: next game with a live score while it is on, upcoming fixtures, results, and the division or conference table. Pick your team from a searchable list inside the panel — no config file editing.",
