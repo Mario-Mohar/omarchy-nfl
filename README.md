@@ -116,6 +116,9 @@ In `~/.config/omarchy/shell.json`, on the `{"id": "themo.nfl"}` entry:
 | `standingsScope` | `division` | Standings view on open |
 | `icon` | `` | Bar glyph |
 | `winColor` | `#6f9e5f` | Win badge color; losses use the theme's `urgent` |
+| `notifyKickoff` | `false` | Desktop notification when the game starts |
+| `notifyFinal` | `false` | Desktop notification with the result and the new record |
+| `notifyLead` | `false` | Desktop notification when the other side goes in front |
 
 Example:
 
@@ -125,6 +128,25 @@ Example:
 
 `barFormat: icon` uses the bar's narrow icon slot. The text variants render in
 a button that grows with its label, so they never overlap neighbouring widgets.
+
+## Notifications
+
+All three are off by default. NFL games land late evening and overnight in
+Central Europe, which is not a time to surprise somebody who installed this
+for the quiet glyph.
+
+They hang off the poll, not off anything on screen, so a collapsed bar widget
+and a shut popup still notify. Kickoff is therefore noticed at the next poll
+and can be up to `refreshMinutes` late; once a game is live the interval is a
+minute on its own, so the final score and lead changes arrive promptly.
+
+What was last announced per game is kept in `~/.local/state/omarchy/nfl-notified.json`,
+which is what stops `omarchy restart shell` during a game from announcing
+kickoff a second time. A game that file has never seen is recorded silently —
+switching notifications on does not replay a season that is already over.
+
+`notify-send` (libnotify) does the actual notifying. If it or the notification
+daemon is missing, nothing is announced and nothing complains.
 
 ## Data
 
@@ -139,8 +161,9 @@ bin/nfl-data --team kc --no-cache   # force a fresh fetch
 bin/nfl-data --teams                # the 32-team roster for the picker
 ```
 
-Caches live in `~/.local/state/omarchy/`: `nfl-<team>.json` per team, and
-`nfl-teams.json` for the roster (refreshed weekly). If a fetch fails, the last
+Caches live in `~/.local/state/omarchy/`: `nfl-<team>.json` per team,
+`nfl-teams.json` for the roster (refreshed weekly), and `nfl-notified.json`
+for what the notifications have already announced. If a fetch fails, the last
 good payload is served so the popup never goes blank; the picker additionally
 falls back to a roster baked into the script, so it works offline.
 

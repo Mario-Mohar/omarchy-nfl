@@ -1,0 +1,192 @@
+#!/usr/bin/env python3
+"""Announce kickoff, final score and lead changes for the followed team.
+
+The panel cannot decide this on its own. It polls, and a poll only ever shows
+the *current* state of a game -- so "the game is live" is true on every tick
+from kickoff to the final whistle, and firing on that would notify once a
+minute. What matters is the moment the state changed, which means remembering
+what was announced last time. In the shell that memory would die with every
+`omarchy restart shell`, and a restart during a game would announce kickoff a
+second time; here it lives in the same state directory as the schedule cache
+and survives.
+
+A game the state file has never seen is recorded silently. That is what keeps
+a freshly enabled notification setting from firing seventeen "final score"
+popups for a season that finished months ago, and it is why the panel reports
+the upcoming game every poll rather than only once it has started: the game is
+already on file as `pre` long before kickoff turns it into a transition.
+
+Usage: nfl-notify '<json>'   (the panel builds the document; see Panel.qml)
+"""
+
+import json
+import os
+import subprocess
+import sys
+import time
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import nflcommon  # noqa: E402  (hardened state-directory access)
+
+FILENAME = "nfl-notified.json"
+# One entry per game, and a season is about 25. The cap only matters if a
+# state file survives across seasons, which it will.
+MAX_GAMES = 64
+MAX_PAYLOAD_BYTES = 16 * 1024
+MAX_TEXT = 200
+PHASES = ("pre", "in", "post")
+LEADS = ("team", "opp", "tie")
+KINDS = ("kickoff", "final", "lead")
+
+
+def clean_id(value):
+    """Game ids come from ESPN and end up as dictionary keys we write out."""
+    text = "".join(c for c in str(value or "") if c.isalnum() or c in "-_")
+    return text[:32]
+
+
+def clean_text(value):
+    # notify-send takes these as arguments, never through a shell, so the only
+    # thing worth bounding here is the length.
+    return " ".join(str(value or "").split())[:MAX_TEXT]
+
+
+def load_state(dir_fd):
+    """The last announced phase and leader per game, or an empty record.
+
+    Never raises: a hand-edited file, a symlink in the state directory or a
+    truncated write all mean the same thing -- start over rather than take a
+    notification down with a traceback nobody will see.
+    """
+    try:
+        raw = nflcommon.read_bounded(dir_fd, FILENAME)
+    except OSError:
+        return {}
+    if raw is None:
+        return {}
+    try:
+        data = json.loads(raw.decode("utf-8", "replace"))
+    except ValueError:
+        return {}
+    games = (data or {}).get("games")
+    return games if isinstance(games, dict) else {}
+
+
+def prune(games):
+    if len(games) <= MAX_GAMES:
+        return games
+    ordered = sorted(games.items(), key=lambda kv: kv[1].get("ts", 0), reverse=True)
+    return dict(ordered[:MAX_GAMES])
+
+
+def transitions(previous, phase, lead):
+    """Which of the three events this poll represents, if any."""
+    events = []
+    was = previous.get("phase")
+    if was != phase:
+        if phase == "in" and was == "pre":
+            events.append("kickoff")
+        elif phase == "post" and was in ("pre", "in"):
+            # `pre` straight to `post` is a machine that was asleep through the
+            # whole game. The result is still worth having.
+            events.append("final")
+
+    if phase == "in" and lead in ("team", "opp"):
+        # Compared against the last side that actually led: counting a tie as a
+        # change would announce every equaliser, and going ahead again after
+        # one would then not register as a lead change at all.
+        before = previous.get("lead")
+        if before in ("team", "opp") and before != lead:
+            events.append("lead")
+
+    # Kickoff or a final whistle says everything a lead change would.
+    if "kickoff" in events or "final" in events:
+        events = [e for e in events if e != "lead"]
+    return events
+
+
+def notify(title, body):
+    if not title:
+        return
+    try:
+        subprocess.run(["notify-send", "--app-name", "NFL", title, body],
+                       timeout=10, check=False)
+    except (OSError, subprocess.SubprocessError):
+        # No libnotify, or no notification daemon running. A widget that shows
+        # a football score is not the place to complain about it.
+        pass
+
+
+def handle(games, entry, want):
+    game_id = clean_id(entry.get("id"))
+    phase = str(entry.get("phase") or "")
+    lead = str(entry.get("lead") or "")
+    if not game_id or phase not in PHASES:
+        return
+    if lead not in LEADS:
+        lead = "tie"
+
+    previous = games.get(game_id)
+    fire = transitions(previous, phase, lead) if isinstance(previous, dict) else []
+
+    # Recorded whether or not anything is announced: a disabled event must
+    # still move the state on, or switching it back on later would replay a
+    # transition that has long since happened.
+    record = {"phase": phase, "ts": int(time.time())}
+    kept = (previous or {}).get("lead") if isinstance(previous, dict) else None
+    record["lead"] = lead if lead in ("team", "opp") else (kept or "")
+    games[game_id] = record
+
+    messages = entry.get("messages")
+    if not isinstance(messages, dict):
+        return
+    for kind in fire:
+        if kind not in want or kind not in KINDS:
+            continue
+        message = messages.get(kind)
+        if not isinstance(message, dict):
+            continue
+        notify(clean_text(message.get("title")), clean_text(message.get("body")))
+
+
+def main(argv):
+    if len(argv) != 2:
+        sys.stderr.write("nfl-notify: expected one JSON argument\n")
+        return 2
+    if len(argv[1].encode("utf-8")) > MAX_PAYLOAD_BYTES:
+        sys.stderr.write("nfl-notify: payload too large\n")
+        return 2
+    try:
+        payload = json.loads(argv[1])
+    except ValueError:
+        sys.stderr.write("nfl-notify: payload is not JSON\n")
+        return 2
+
+    want = [str(w) for w in (payload.get("want") or []) if str(w) in KINDS]
+    entries = payload.get("games")
+    if not isinstance(entries, list) or not entries:
+        return 0
+
+    try:
+        dir_fd = nflcommon.open_dir(nflcommon.state_path(), create=True)
+    except OSError as exc:
+        sys.stderr.write("nfl-notify: %s\n" % exc)
+        return 1
+    try:
+        games = load_state(dir_fd)
+        for entry in entries[:8]:
+            if isinstance(entry, dict):
+                handle(games, entry, want)
+        nflcommon.write_atomic(
+            dir_fd, FILENAME,
+            json.dumps({"version": 1, "games": prune(games)}))
+    except OSError as exc:
+        sys.stderr.write("nfl-notify: %s\n" % exc)
+        return 1
+    finally:
+        os.close(dir_fd)
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv))

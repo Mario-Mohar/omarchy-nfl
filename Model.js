@@ -380,3 +380,78 @@ function tooltipText(data) {
   }
   return lines.join("\n")
 }
+
+// ---- Notifications --------------------------------------------------------
+
+// Which side is ahead right now. "tie" also covers a game with no score yet,
+// which is what an untouched scoreboard at kickoff looks like.
+function leadSide(game) {
+  if (!game || game.teamScore === null || game.oppScore === null) return "tie"
+  if (game.teamScore > game.oppScore) return "team"
+  if (game.teamScore < game.oppScore) return "opp"
+  return "tie"
+}
+
+function notifyTitle(data, game, kind) {
+  if (!data || !game) return ""
+  var abbr = String((data.team && data.team.abbr) || "").toUpperCase()
+  if (kind === "kickoff") return "Kickoff: " + abbr + " " + opponentLabel(game)
+  if (kind === "final") {
+    var word = game.result === "W" ? "Win" : game.result === "L" ? "Loss"
+      : game.result === "T" ? "Tie" : "Final"
+    return word + " " + scoreLine(game) + " " + opponentLabel(game)
+  }
+  // A lead change is read at a glance or not at all, so the score leads.
+  return scoreLine(game) + " " + opponentLabel(game)
+}
+
+function notifyBody(data, game, kind) {
+  if (!data || !game) return ""
+  if (kind === "kickoff") {
+    var where = String(game.venue || "")
+    return weekLabel(game) + (where ? " · " + where : "")
+  }
+  if (kind === "final") {
+    var record = regularRecordLabel(data) || recordLabel(data)
+    return weekLabel(game) + (record ? " · now " + record : "")
+  }
+  var side = leadSide(game)
+  var who = side === "team" ? String((data.team && data.team.abbr) || "").toUpperCase()
+    : side === "opp" ? String(game.opponent || "") : ""
+  var clock = (game.period ? "Q" + game.period : "")
+    + (game.displayClock ? " " + game.displayClock : "")
+  return (who ? who + " in front" : "Level") + (clock ? " · " + clock.trim() : "")
+}
+
+// One entry for nfl-notify: the facts it compares against the state file, and
+// the three texts it might need. Built here so the helper never has to know
+// what a division or a bye week is.
+function notifyEntry(data, game) {
+  if (!data || !game || !game.id) return null
+  var kinds = ["kickoff", "final", "lead"]
+  var messages = {}
+  for (var i = 0; i < kinds.length; i++) {
+    messages[kinds[i]] = { title: notifyTitle(data, game, kinds[i]),
+                           body: notifyBody(data, game, kinds[i]) }
+  }
+  return { id: String(game.id), phase: String(game.state || "pre"),
+           lead: leadSide(game), messages: messages }
+}
+
+// The upcoming game and the most recent finished one. The first is what turns
+// into a kickoff, the second is what a final score comes off -- and once a
+// game ends it stops being `nextGame`, so reporting only that would mean the
+// final whistle is never seen.
+function notifyEntries(data) {
+  var out = []
+  var seen = {}
+  var candidates = [nextGame(data), lastGame(data)]
+  for (var i = 0; i < candidates.length; i++) {
+    var entry = notifyEntry(data, candidates[i])
+    if (entry && !seen[entry.id]) {
+      seen[entry.id] = true
+      out.push(entry)
+    }
+  }
+  return out
+}

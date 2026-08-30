@@ -72,6 +72,12 @@ Panel {
   readonly property color winColor: setting("winColor", "#6f9e5f")
   readonly property color lossColor: Color.urgent
 
+  // Off by default, all three: a football score is not worth waking someone at
+  // three in the morning who installed this for the quiet glyph.
+  readonly property bool notifyKickoff: setting("notifyKickoff", false)
+  readonly property bool notifyFinal: setting("notifyFinal", false)
+  readonly property bool notifyLead: setting("notifyLead", false)
+
   // ---- Team --------------------------------------------------------------
 
   // Picked in the panel and stored outside shell.json (bin/nfl-team owns the
@@ -127,6 +133,7 @@ Panel {
   // bin/ ships next to this file; resolving keeps the plugin relocatable.
   readonly property string scriptPath: Qt.resolvedUrl("bin/nfl-data").toString().replace(/^file:\/\//, "")
   readonly property string teamScriptPath: Qt.resolvedUrl("bin/nfl-team").toString().replace(/^file:\/\//, "")
+  readonly property string notifyScriptPath: Qt.resolvedUrl("bin/nfl-notify").toString().replace(/^file:\/\//, "")
 
   // A refresh asked for while one is in flight is queued, never dropped: at
   // startup the stored team lands after the first fetch has already begun, so
@@ -158,6 +165,26 @@ Panel {
   function forceRefresh() {
     dataProc.running = false
     refresh(true)
+  }
+
+  // Hung off the poll rather than off anything on screen. A bar widget gets
+  // collapsed when the bar runs out of room and the popup is shut most of the
+  // time, so neither can be what decides whether a kickoff is noticed; the
+  // Loader in BarWidget.qml stays active either way, and so does this timer.
+  //
+  // Every poll reports the upcoming game and the last finished one, in whatever
+  // state they are in. Deciding which of those states is *new* is nfl-notify's
+  // job, because that answer has to outlive the shell process.
+  function announce(data) {
+    if (!notifyKickoff && !notifyFinal && !notifyLead) return
+    var entries = Model.notifyEntries(data)
+    if (!entries.length) return
+    var want = []
+    if (notifyKickoff) want.push("kickoff")
+    if (notifyFinal) want.push("final")
+    if (notifyLead) want.push("lead")
+    Quickshell.execDetached([notifyScriptPath,
+      JSON.stringify({ want: want, games: entries })])
   }
 
   function setScope(scope) {
@@ -237,6 +264,7 @@ Panel {
         if (parsed) {
           root.report = parsed
           root.everLoaded = true
+          root.announce(parsed)
         }
       }
     }
