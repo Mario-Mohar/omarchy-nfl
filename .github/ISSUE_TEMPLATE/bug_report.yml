@@ -1,0 +1,40 @@
+name: Bug report
+description: Something behaves differently than it should
+labels: ["bug"]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happens
+      description: What you saw, and what you expected instead.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. ...
+        2. ...
+        3. ...
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Plugin version
+      description: The `version` field in manifest.json, or what `omarchy plugin list` shows.
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Omarchy and compositor version
+    validations:
+      required: true
+  - type: textarea
+    id: helper
+    attributes:
+      label: Helper output
+      description: What `bin/nfl-data` prints when you run it by hand. Often this alone identifies the problem.
+      render: shell
