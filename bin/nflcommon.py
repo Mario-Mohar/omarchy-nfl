@@ -75,7 +75,8 @@ def read_bounded(dir_fd, name, max_bytes=MAX_CACHE_BYTES):
         return None
     except OSError as exc:
         if exc.errno in (errno.ELOOP, errno.EMLINK):
-            raise OSError(errno.ELOOP, "%s is a symlink, refusing to read it" % name)
+            raise OSError(errno.ELOOP,
+                          "%s is a symlink, refusing to read it" % name) from exc
         raise
 
     try:
