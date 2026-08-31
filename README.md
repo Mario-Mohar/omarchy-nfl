@@ -191,3 +191,12 @@ National Football League.
 ## License
 
 [MIT](LICENSE)
+
+## Contributing
+
+Bug reports, feature requests and pull requests are all welcome — finding
+something that is broken and writing it down is a real contribution, and the
+most useful one.
+
+**[CONTRIBUTING.md](CONTRIBUTING.md)** has the details: what makes a report
+useful, how to send a fix through a fork, and what happens after you submit.
