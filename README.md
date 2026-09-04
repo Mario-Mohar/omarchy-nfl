@@ -1,5 +1,7 @@
 # NFL for the Omarchy shell
 
+[![codecov](https://codecov.io/gh/Mario-Mohar/omarchy-nfl/graph/badge.svg)](https://codecov.io/gh/Mario-Mohar/omarchy-nfl)
+
 A bar widget for [Omarchy](https://omarchy.org/): a football glyph in the bar,
 and a popup with the full season — schedule, live score, results and standings
 — for **any of the 32 NFL teams**. Pick your team from a searchable list inside
