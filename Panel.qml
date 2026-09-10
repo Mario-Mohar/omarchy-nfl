@@ -57,8 +57,15 @@ Panel {
     return false
   }
 
+  // The bar a plugin sees is the PluginBarApi facade, where the property is
+  // read-only and only the setter moves it. Assigning it directly there throws,
+  // and the throw takes out the rest of open()/close() with it: the panel then
+  // never shows or hides and the bar looks stuck. Setter first, assignment only
+  // for a host Bar that exposes the plain property.
   function setCenterHoverRevealSuppressed(value) {
-    if (root.bar && "centerHoverRevealSuppressed" in root.bar)
+    if (root.bar && typeof root.bar.setCenterHoverRevealSuppressed === "function")
+      root.bar.setCenterHoverRevealSuppressed(value)
+    else if (root.bar && "centerHoverRevealSuppressed" in root.bar)
       root.bar.centerHoverRevealSuppressed = value
   }
 
