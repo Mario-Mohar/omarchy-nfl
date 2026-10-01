@@ -88,7 +88,7 @@ jobs:
       # anyway. The repository is public, so the upload needs no token.
       - name: Coverage to Codecov
         if: always()
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v7
         with:
           files: coverage.xml
           fail_ci_if_error: false
