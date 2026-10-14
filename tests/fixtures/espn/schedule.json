@@ -1,0 +1,909 @@
+{
+ "season": {
+  "year": 2026,
+  "type": 2,
+  "name": "Regular Season"
+ },
+ "team": {
+  "abbreviation": "SF",
+  "displayName": "San Francisco 49ers",
+  "shortDisplayName": "49ers",
+  "color": "aa0000"
+ },
+ "events": [
+  {
+   "id": "401771001",
+   "date": "2026-09-06T20:25Z",
+   "shortName": "",
+   "week": {
+    "number": 1,
+    "text": "Week 1"
+   },
+   "competitions": [
+    {
+     "neutralSite": false,
+     "venue": {
+      "fullName": "Levi's Stadium",
+      "address": {
+       "city": "Santa Clara"
+      }
+     },
+     "status": {
+      "type": {
+       "id": "3",
+       "name": "STATUS_FINAL",
+       "state": "post",
+       "completed": true,
+       "description": "Final",
+       "detail": "Final",
+       "shortDetail": "Final"
+      },
+      "period": 4,
+      "displayClock": "0:00"
+     },
+     "competitors": [
+      {
+       "homeAway": "away",
+       "team": {
+        "id": "25",
+        "abbreviation": "SF",
+        "displayName": "San Francisco 49ers",
+        "shortDisplayName": "49ers"
+       },
+       "score": {
+        "value": 24.0,
+        "displayValue": "24"
+       }
+      },
+      {
+       "homeAway": "home",
+       "team": {
+        "abbreviation": "SEA",
+        "displayName": "Seattle Seahawks",
+        "shortDisplayName": "Seahawks"
+       },
+       "score": {
+        "value": 20.0,
+        "displayValue": "20"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "401771002",
+   "date": "2026-09-13T20:25Z",
+   "shortName": "",
+   "week": {
+    "number": 2,
+    "text": "Week 2"
+   },
+   "competitions": [
+    {
+     "neutralSite": false,
+     "venue": {
+      "fullName": "Levi's Stadium",
+      "address": {
+       "city": "Santa Clara"
+      }
+     },
+     "status": {
+      "type": {
+       "id": "3",
+       "name": "STATUS_FINAL",
+       "state": "post",
+       "completed": true,
+       "description": "Final",
+       "detail": "Final",
+       "shortDetail": "Final"
+      },
+      "period": 4,
+      "displayClock": "0:00"
+     },
+     "competitors": [
+      {
+       "homeAway": "home",
+       "team": {
+        "id": "25",
+        "abbreviation": "SF",
+        "displayName": "San Francisco 49ers",
+        "shortDisplayName": "49ers"
+       },
+       "score": {
+        "value": 24.0,
+        "displayValue": "24"
+       }
+      },
+      {
+       "homeAway": "away",
+       "team": {
+        "abbreviation": "LAR",
+        "displayName": "Los Angeles Rams",
+        "shortDisplayName": "Rams"
+       },
+       "score": {
+        "value": 20.0,
+        "displayValue": "20"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "401771003",
+   "date": "2026-09-20T20:25Z",
+   "shortName": "",
+   "week": {
+    "number": 3,
+    "text": "Week 3"
+   },
+   "competitions": [
+    {
+     "neutralSite": false,
+     "venue": {
+      "fullName": "Levi's Stadium",
+      "address": {
+       "city": "Santa Clara"
+      }
+     },
+     "status": {
+      "type": {
+       "id": "3",
+       "name": "STATUS_FINAL",
+       "state": "post",
+       "completed": true,
+       "description": "Final",
+       "detail": "Final",
+       "shortDetail": "Final"
+      },
+      "period": 4,
+      "displayClock": "0:00"
+     },
+     "competitors": [
+      {
+       "homeAway": "away",
+       "team": {
+        "id": "25",
+        "abbreviation": "SF",
+        "displayName": "San Francisco 49ers",
+        "shortDisplayName": "49ers"
+       },
+       "score": {
+        "value": 24.0,
+        "displayValue": "24"
+       }
+      },
+      {
+       "homeAway": "home",
+       "team": {
+        "abbreviation": "ARI",
+        "displayName": "Arizona Cardinals",
+        "shortDisplayName": "Cardinals"
+       },
+       "score": {
+        "value": 20.0,
+        "displayValue": "20"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "401771004",
+   "date": "2026-09-27T20:25Z",
+   "shortName": "",
+   "week": {
+    "number": 4,
+    "text": "Week 4"
+   },
+   "competitions": [
+    {
+     "neutralSite": false,
+     "venue": {
+      "fullName": "Levi's Stadium",
+      "address": {
+       "city": "Santa Clara"
+      }
+     },
+     "status": {
+      "type": {
+       "id": "3",
+       "name": "STATUS_FINAL",
+       "state": "post",
+       "completed": true,
+       "description": "Final",
+       "detail": "Final",
+       "shortDetail": "Final"
+      },
+      "period": 4,
+      "displayClock": "0:00"
+     },
+     "competitors": [
+      {
+       "homeAway": "home",
+       "team": {
+        "id": "25",
+        "abbreviation": "SF",
+        "displayName": "San Francisco 49ers",
+        "shortDisplayName": "49ers"
+       },
+       "score": {
+        "value": 24.0,
+        "displayValue": "24"
+       }
+      },
+      {
+       "homeAway": "away",
+       "team": {
+        "abbreviation": "SEA",
+        "displayName": "Seattle Seahawks",
+        "shortDisplayName": "Seahawks"
+       },
+       "score": {
+        "value": 20.0,
+        "displayValue": "20"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "401771005",
+   "date": "2026-10-04T20:25Z",
+   "shortName": "",
+   "week": {
+    "number": 5,
+    "text": "Week 5"
+   },
+   "competitions": [
+    {
+     "neutralSite": false,
+     "venue": {
+      "fullName": "Levi's Stadium",
+      "address": {
+       "city": "Santa Clara"
+      }
+     },
+     "status": {
+      "type": {
+       "id": "3",
+       "name": "STATUS_FINAL",
+       "state": "post",
+       "completed": true,
+       "description": "Final",
+       "detail": "Final",
+       "shortDetail": "Final"
+      },
+      "period": 4,
+      "displayClock": "0:00"
+     },
+     "competitors": [
+      {
+       "homeAway": "away",
+       "team": {
+        "id": "25",
+        "abbreviation": "SF",
+        "displayName": "San Francisco 49ers",
+        "shortDisplayName": "49ers"
+       },
+       "score": {
+        "value": 24.0,
+        "displayValue": "24"
+       }
+      },
+      {
+       "homeAway": "home",
+       "team": {
+        "abbreviation": "LAR",
+        "displayName": "Los Angeles Rams",
+        "shortDisplayName": "Rams"
+       },
+       "score": {
+        "value": 20.0,
+        "displayValue": "20"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "401771006",
+   "date": "2026-10-11T20:25Z",
+   "shortName": "",
+   "week": {
+    "number": 6,
+    "text": "Week 6"
+   },
+   "competitions": [
+    {
+     "neutralSite": false,
+     "venue": {
+      "fullName": "Levi's Stadium",
+      "address": {
+       "city": "Santa Clara"
+      }
+     },
+     "status": {
+      "type": {
+       "id": "1",
+       "name": "STATUS_SCHEDULED",
+       "state": "pre",
+       "completed": false,
+       "description": "Scheduled",
+       "detail": "TBD",
+       "shortDetail": "TBD"
+      },
+      "period": 0,
+      "displayClock": "0:00"
+     },
+     "competitors": [
+      {
+       "homeAway": "home",
+       "team": {
+        "id": "25",
+        "abbreviation": "SF",
+        "displayName": "San Francisco 49ers",
+        "shortDisplayName": "49ers"
+       },
+       "score": null
+      },
+      {
+       "homeAway": "away",
+       "team": {
+        "abbreviation": "ARI",
+        "displayName": "Arizona Cardinals",
+        "shortDisplayName": "Cardinals"
+       },
+       "score": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "401771007",
+   "date": "2026-10-18T20:25Z",
+   "shortName": "",
+   "week": {
+    "number": 7,
+    "text": "Week 7"
+   },
+   "competitions": [
+    {
+     "neutralSite": false,
+     "venue": {
+      "fullName": "Levi's Stadium",
+      "address": {
+       "city": "Santa Clara"
+      }
+     },
+     "status": {
+      "type": {
+       "id": "1",
+       "name": "STATUS_SCHEDULED",
+       "state": "pre",
+       "completed": false,
+       "description": "Scheduled",
+       "detail": "TBD",
+       "shortDetail": "TBD"
+      },
+      "period": 0,
+      "displayClock": "0:00"
+     },
+     "competitors": [
+      {
+       "homeAway": "away",
+       "team": {
+        "id": "25",
+        "abbreviation": "SF",
+        "displayName": "San Francisco 49ers",
+        "shortDisplayName": "49ers"
+       },
+       "score": null
+      },
+      {
+       "homeAway": "home",
+       "team": {
+        "abbreviation": "SEA",
+        "displayName": "Seattle Seahawks",
+        "shortDisplayName": "Seahawks"
+       },
+       "score": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "401771008",
+   "date": "2026-10-25T20:25Z",
+   "shortName": "",
+   "week": {
+    "number": 8,
+    "text": "Week 8"
+   },
+   "competitions": [
+    {
+     "neutralSite": false,
+     "venue": {
+      "fullName": "Levi's Stadium",
+      "address": {
+       "city": "Santa Clara"
+      }
+     },
+     "status": {
+      "type": {
+       "id": "1",
+       "name": "STATUS_SCHEDULED",
+       "state": "pre",
+       "completed": false,
+       "description": "Scheduled",
+       "detail": "TBD",
+       "shortDetail": "TBD"
+      },
+      "period": 0,
+      "displayClock": "0:00"
+     },
+     "competitors": [
+      {
+       "homeAway": "home",
+       "team": {
+        "id": "25",
+        "abbreviation": "SF",
+        "displayName": "San Francisco 49ers",
+        "shortDisplayName": "49ers"
+       },
+       "score": null
+      },
+      {
+       "homeAway": "away",
+       "team": {
+        "abbreviation": "LAR",
+        "displayName": "Los Angeles Rams",
+        "shortDisplayName": "Rams"
+       },
+       "score": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "401771009",
+   "date": "2026-11-01T21:05Z",
+   "shortName": "",
+   "week": {
+    "number": 9,
+    "text": "Week 9"
+   },
+   "competitions": [
+    {
+     "neutralSite": false,
+     "venue": {
+      "fullName": "Levi's Stadium",
+      "address": {
+       "city": "Santa Clara"
+      }
+     },
+     "status": {
+      "type": {
+       "id": "1",
+       "name": "STATUS_SCHEDULED",
+       "state": "pre",
+       "completed": false,
+       "description": "Scheduled",
+       "detail": "TBD",
+       "shortDetail": "TBD"
+      },
+      "period": 0,
+      "displayClock": "0:00"
+     },
+     "competitors": [
+      {
+       "homeAway": "away",
+       "team": {
+        "id": "25",
+        "abbreviation": "SF",
+        "displayName": "San Francisco 49ers",
+        "shortDisplayName": "49ers"
+       },
+       "score": null
+      },
+      {
+       "homeAway": "home",
+       "team": {
+        "abbreviation": "ARI",
+        "displayName": "Arizona Cardinals",
+        "shortDisplayName": "Cardinals"
+       },
+       "score": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "401771010",
+   "date": "2026-11-08T21:05Z",
+   "shortName": "",
+   "week": {
+    "number": 10,
+    "text": "Week 10"
+   },
+   "competitions": [
+    {
+     "neutralSite": false,
+     "venue": {
+      "fullName": "Levi's Stadium",
+      "address": {
+       "city": "Santa Clara"
+      }
+     },
+     "status": {
+      "type": {
+       "id": "1",
+       "name": "STATUS_SCHEDULED",
+       "state": "pre",
+       "completed": false,
+       "description": "Scheduled",
+       "detail": "TBD",
+       "shortDetail": "TBD"
+      },
+      "period": 0,
+      "displayClock": "0:00"
+     },
+     "competitors": [
+      {
+       "homeAway": "home",
+       "team": {
+        "id": "25",
+        "abbreviation": "SF",
+        "displayName": "San Francisco 49ers",
+        "shortDisplayName": "49ers"
+       },
+       "score": null
+      },
+      {
+       "homeAway": "away",
+       "team": {
+        "abbreviation": "SEA",
+        "displayName": "Seattle Seahawks",
+        "shortDisplayName": "Seahawks"
+       },
+       "score": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "401771011",
+   "date": "2026-11-15T21:05Z",
+   "shortName": "",
+   "week": {
+    "number": 11,
+    "text": "Week 11"
+   },
+   "competitions": [
+    {
+     "neutralSite": false,
+     "venue": {
+      "fullName": "Levi's Stadium",
+      "address": {
+       "city": "Santa Clara"
+      }
+     },
+     "status": {
+      "type": {
+       "id": "1",
+       "name": "STATUS_SCHEDULED",
+       "state": "pre",
+       "completed": false,
+       "description": "Scheduled",
+       "detail": "TBD",
+       "shortDetail": "TBD"
+      },
+      "period": 0,
+      "displayClock": "0:00"
+     },
+     "competitors": [
+      {
+       "homeAway": "away",
+       "team": {
+        "id": "25",
+        "abbreviation": "SF",
+        "displayName": "San Francisco 49ers",
+        "shortDisplayName": "49ers"
+       },
+       "score": null
+      },
+      {
+       "homeAway": "home",
+       "team": {
+        "abbreviation": "LAR",
+        "displayName": "Los Angeles Rams",
+        "shortDisplayName": "Rams"
+       },
+       "score": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "401771012",
+   "date": "2026-11-22T21:05Z",
+   "shortName": "",
+   "week": {
+    "number": 12,
+    "text": "Week 12"
+   },
+   "competitions": [
+    {
+     "neutralSite": false,
+     "venue": {
+      "fullName": "Levi's Stadium",
+      "address": {
+       "city": "Santa Clara"
+      }
+     },
+     "status": {
+      "type": {
+       "id": "1",
+       "name": "STATUS_SCHEDULED",
+       "state": "pre",
+       "completed": false,
+       "description": "Scheduled",
+       "detail": "TBD",
+       "shortDetail": "TBD"
+      },
+      "period": 0,
+      "displayClock": "0:00"
+     },
+     "competitors": [
+      {
+       "homeAway": "home",
+       "team": {
+        "id": "25",
+        "abbreviation": "SF",
+        "displayName": "San Francisco 49ers",
+        "shortDisplayName": "49ers"
+       },
+       "score": null
+      },
+      {
+       "homeAway": "away",
+       "team": {
+        "abbreviation": "ARI",
+        "displayName": "Arizona Cardinals",
+        "shortDisplayName": "Cardinals"
+       },
+       "score": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "401771013",
+   "date": "2026-12-06T21:05Z",
+   "shortName": "",
+   "week": {
+    "number": 13,
+    "text": "Week 13"
+   },
+   "competitions": [
+    {
+     "neutralSite": false,
+     "venue": {
+      "fullName": "Levi's Stadium",
+      "address": {
+       "city": "Santa Clara"
+      }
+     },
+     "status": {
+      "type": {
+       "id": "1",
+       "name": "STATUS_SCHEDULED",
+       "state": "pre",
+       "completed": false,
+       "description": "Scheduled",
+       "detail": "TBD",
+       "shortDetail": "TBD"
+      },
+      "period": 0,
+      "displayClock": "0:00"
+     },
+     "competitors": [
+      {
+       "homeAway": "away",
+       "team": {
+        "id": "25",
+        "abbreviation": "SF",
+        "displayName": "San Francisco 49ers",
+        "shortDisplayName": "49ers"
+       },
+       "score": null
+      },
+      {
+       "homeAway": "home",
+       "team": {
+        "abbreviation": "SEA",
+        "displayName": "Seattle Seahawks",
+        "shortDisplayName": "Seahawks"
+       },
+       "score": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "401771015",
+   "date": "2026-12-20T21:05Z",
+   "shortName": "",
+   "week": {
+    "number": 15,
+    "text": "Week 15"
+   },
+   "competitions": [
+    {
+     "neutralSite": false,
+     "venue": {
+      "fullName": "Levi's Stadium",
+      "address": {
+       "city": "Santa Clara"
+      }
+     },
+     "status": {
+      "type": {
+       "id": "1",
+       "name": "STATUS_SCHEDULED",
+       "state": "pre",
+       "completed": false,
+       "description": "Scheduled",
+       "detail": "TBD",
+       "shortDetail": "TBD"
+      },
+      "period": 0,
+      "displayClock": "0:00"
+     },
+     "competitors": [
+      {
+       "homeAway": "away",
+       "team": {
+        "id": "25",
+        "abbreviation": "SF",
+        "displayName": "San Francisco 49ers",
+        "shortDisplayName": "49ers"
+       },
+       "score": null
+      },
+      {
+       "homeAway": "home",
+       "team": {
+        "abbreviation": "ARI",
+        "displayName": "Arizona Cardinals",
+        "shortDisplayName": "Cardinals"
+       },
+       "score": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "401771016",
+   "date": "2026-12-27T21:05Z",
+   "shortName": "",
+   "week": {
+    "number": 16,
+    "text": "Week 16"
+   },
+   "competitions": [
+    {
+     "neutralSite": false,
+     "venue": {
+      "fullName": "Levi's Stadium",
+      "address": {
+       "city": "Santa Clara"
+      }
+     },
+     "status": {
+      "type": {
+       "id": "1",
+       "name": "STATUS_SCHEDULED",
+       "state": "pre",
+       "completed": false,
+       "description": "Scheduled",
+       "detail": "TBD",
+       "shortDetail": "TBD"
+      },
+      "period": 0,
+      "displayClock": "0:00"
+     },
+     "competitors": [
+      {
+       "homeAway": "home",
+       "team": {
+        "id": "25",
+        "abbreviation": "SF",
+        "displayName": "San Francisco 49ers",
+        "shortDisplayName": "49ers"
+       },
+       "score": null
+      },
+      {
+       "homeAway": "away",
+       "team": {
+        "abbreviation": "SEA",
+        "displayName": "Seattle Seahawks",
+        "shortDisplayName": "Seahawks"
+       },
+       "score": null
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "401771017",
+   "date": "2026-12-34T21:05Z",
+   "shortName": "",
+   "week": {
+    "number": 17,
+    "text": "Week 17"
+   },
+   "competitions": [
+    {
+     "neutralSite": false,
+     "venue": {
+      "fullName": "Levi's Stadium",
+      "address": {
+       "city": "Santa Clara"
+      }
+     },
+     "status": {
+      "type": {
+       "id": "1",
+       "name": "STATUS_SCHEDULED",
+       "state": "pre",
+       "completed": false,
+       "description": "Scheduled",
+       "detail": "TBD",
+       "shortDetail": "TBD"
+      },
+      "period": 0,
+      "displayClock": "0:00"
+     },
+     "competitors": [
+      {
+       "homeAway": "away",
+       "team": {
+        "id": "25",
+        "abbreviation": "SF",
+        "displayName": "San Francisco 49ers",
+        "shortDisplayName": "49ers"
+       },
+       "score": null
+      },
+      {
+       "homeAway": "home",
+       "team": {
+        "abbreviation": "LAR",
+        "displayName": "Los Angeles Rams",
+        "shortDisplayName": "Rams"
+       },
+       "score": null
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

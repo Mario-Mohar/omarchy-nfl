@@ -74,6 +74,9 @@ FALLBACK_TEAMS = [
 
 TEAMS_TTL = 7 * 24 * 3600
 
+# What a failed or garbled ESPN request raises. HTTPError is a URLError, a
+# timeout an OSError, a body that is not JSON a ValueError.
+FETCH_ERRORS = (urllib.error.URLError, ValueError, OSError)
 
 
 def get(url):
@@ -199,11 +202,10 @@ def parse_event(event, team_abbr, stype_id, stype_name, stype_abbr):
 
 
 def fetch_schedule(team, season, stype_id, stype_name, stype_abbr):
+    # A failed request raises: an empty list would read as "no games of this
+    # type" and end up in the cache. See build().
     url = "%s/teams/%s/schedule?season=%d&seasontype=%d" % (SITE, team, season, stype_id)
-    try:
-        data = get(url)
-    except (urllib.error.URLError, ValueError, OSError):
-        return []
+    data = get(url)
     out = []
     for event in data.get("events") or []:
         g = parse_event(event, team, stype_id, stype_name, stype_abbr)
@@ -245,11 +247,9 @@ def parse_entry(entry, rank):
 
 
 def fetch_standings(team_abbr, season):
+    # Raises on a failed request, like fetch_schedule().
     url = "%s/standings?season=%d&level=3" % (CORE, season)
-    try:
-        data = get(url)
-    except (urllib.error.URLError, ValueError, OSError):
-        return {"division": [], "divisionName": "", "conference": [], "conferenceName": ""}
+    data = get(url)
 
     my_div = my_conf = None
     div_name = conf_name = ""
@@ -343,7 +343,20 @@ def write_cache(dir_fd, name, payload):
         pass
 
 
-def build(team):
+EMPTY_STANDINGS = {"division": [], "divisionName": "", "conference": [], "conferenceName": ""}
+
+
+def build(team, previous=None):
+    """Fetch everything for one team. Returns (payload, complete).
+
+    A failure on the first request raises, and main() falls back to the stale
+    cache. A failure on one of the later ones -- a season type's schedule, the
+    standings -- is patched from `previous`, the last cached payload, when that
+    is the same team and season, and `complete` comes back False so the caller
+    does not cache the patched result as fresh. Without that a single dropped
+    request replaced a full season with three preseason games and an empty
+    table, and the cache held it until the next good fetch.
+    """
     meta = get("%s/teams/%s/schedule" % (SITE, team))
     season_info = meta.get("season") or {}
     season = int(season_info.get("year") or 0)
@@ -353,9 +366,20 @@ def build(team):
     team_info = meta.get("team") or {}
     team_abbr = (team_info.get("abbreviation") or team).upper()
 
+    if not (isinstance(previous, dict) and previous.get("season") == season
+            and str((previous.get("team") or {}).get("abbr") or "").upper() == team_abbr):
+        previous = None
+
+    complete = True
     games = []
     for stype_id, stype_name, stype_abbr in SEASON_TYPES:
-        games.extend(fetch_schedule(team, season, stype_id, stype_name, stype_abbr))
+        try:
+            games.extend(fetch_schedule(team, season, stype_id, stype_name, stype_abbr))
+        except FETCH_ERRORS:
+            complete = False
+            if previous:
+                games.extend(g for g in previous.get("games") or []
+                             if isinstance(g, dict) and g.get("seasonType") == stype_id)
 
     # ESPN can repeat an event across seasontype queries; keep one per id.
     seen = set()
@@ -372,7 +396,11 @@ def build(team):
     losses = sum(1 for g in played if g["result"] == "L")
     ties = sum(1 for g in played if g["result"] == "T")
 
-    standings = fetch_standings(team_abbr, season)
+    try:
+        standings = fetch_standings(team_abbr, season)
+    except FETCH_ERRORS:
+        complete = False
+        standings = (previous or {}).get("standings") or dict(EMPTY_STANDINGS)
 
     return {
         "fetchedAt": int(time.time()),
@@ -388,7 +416,7 @@ def build(team):
         "record": {"wins": wins, "losses": losses, "ties": ties},
         "games": unique,
         "standings": standings,
-    }
+    }, complete
 
 
 def main():
@@ -445,8 +473,17 @@ def main():
             except OSError:
                 pass
 
+        previous = None
         try:
-            payload = json.dumps(build(team), separators=(",", ":"))
+            raw = nflcommon.read_bounded(dir_fd, cache_name)
+            if raw is not None:
+                previous = json.loads(raw.decode("utf-8", "replace"))
+        except (OSError, ValueError):
+            pass
+
+        try:
+            data, complete = build(team, previous)
+            payload = json.dumps(data, separators=(",", ":"))
         except Exception as exc:  # noqa: BLE001 - stale cache beats an empty panel
             try:
                 raw = nflcommon.read_bounded(dir_fd, cache_name)
@@ -458,7 +495,9 @@ def main():
             sys.stderr.write("nfl-data: %s\n" % exc)
             return 1
 
-        if not args.no_cache:
+        # A patched result is shown but not cached: the cache keeps its age,
+        # so the next run tries ESPN again instead of trusting it.
+        if not args.no_cache and complete:
             write_cache(dir_fd, cache_name, payload)
 
         nflcommon.emit(payload)

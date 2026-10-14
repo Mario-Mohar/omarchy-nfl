@@ -166,7 +166,9 @@ bin/nfl-data --teams                # the 32-team roster for the picker
 Caches live in `~/.local/state/omarchy/`: `nfl-<team>.json` per team,
 `nfl-teams.json` for the roster (refreshed weekly), and `nfl-notified.json`
 for what the notifications have already announced. If a fetch fails, the last
-good payload is served so the popup never goes blank; the picker additionally
+good payload is served so the popup never goes blank. If only part of it fails,
+say the standings, that part is taken from the last good payload and the cache
+is left as it was, so the next refresh tries again. The picker additionally
 falls back to a roster baked into the script, so it works offline.
 
 That directory is opened once and every read and write happens relative to that
