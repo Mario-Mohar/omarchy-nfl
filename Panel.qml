@@ -128,7 +128,7 @@ Panel {
   readonly property var nextGame: report ? Model.nextGame(report) : null
   readonly property var lastGame: report ? Model.lastGame(report) : null
   readonly property var upcomingGames: report ? Model.limited(Model.upcoming(report), upcomingCount) : []
-  readonly property var resultGames: report ? Model.limited(Model.reversed(Model.played(report)), resultsCount) : []
+  readonly property var resultGames: report ? Model.limited(Model.reversed(Model.results(report)), resultsCount) : []
   readonly property var standingsRows: report ? Model.standingsRows(report, standingsScope) : []
   readonly property var byes: report ? Model.byeWeeks(report) : []
 
@@ -762,7 +762,7 @@ Panel {
                   Text {
                     textFormat: Text.PlainText
                     anchors.verticalCenter: parent.verticalCenter
-                    text: Model.scoreLine(resultRow.modelData)
+                    text: Model.resultScoreLine(resultRow.modelData)
                     color: root.bar ? root.bar.foreground : Color.foreground
                     font.family: root.bar ? root.bar.fontFamily : Style.font.family
                     font.pixelSize: Style.font.bodySmall
