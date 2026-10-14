@@ -30,7 +30,7 @@ process.stdout.write(JSON.stringify(result === undefined ? null : result));
 """
 
 EXPORTS = ["upcoming", "results", "played", "nextGame", "lastGame", "regularRecordLabel",
-           "resultScoreLine", "tooltipText", "barLabel"]
+           "resultScoreLine", "tooltipText", "barLabel", "cacheMaxAge"]
 
 
 def model(fn, *args):
@@ -86,3 +86,22 @@ def test_live_game_still_counts_as_upcoming(bills_2022):
     data["games"][-1].update(state="in", completed=False, result="")
     assert model("nextGame", data)["id"] == data["games"][-1]["id"]
 
+
+# --------------------------------------------------------------------------
+# Issue #9: a timer tick must not be answered from the previous tick's cache
+# --------------------------------------------------------------------------
+
+@pytest.mark.parametrize("minutes", [1, 2, 15, 120])
+def test_timer_max_age_is_below_the_interval(minutes):
+    # The cache is written a little after a tick, so at the next tick it is
+    # just under one interval old. Anything accepted at that age would be the
+    # previous fetch served again. Half the interval leaves room for a slow
+    # fetch on either side.
+    interval = minutes * 60
+    max_age = model("cacheMaxAge", minutes, "timer")
+    assert 0 < max_age <= interval // 2
+
+
+def test_force_skips_the_cache_and_a_plain_refresh_takes_a_full_interval():
+    assert model("cacheMaxAge", 15, "force") == 0
+    assert model("cacheMaxAge", 15, "") == 900

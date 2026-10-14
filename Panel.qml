@@ -146,32 +146,41 @@ Panel {
   // startup the stored team lands after the first fetch has already begun, so
   // dropping that second request would leave the panel on the wrong team
   // until the next timer tick.
+  // Kinds, weakest first: "" (any cache under a full interval will do),
+  // "timer" (the cache must be younger than the last tick), "force" (no
+  // cache). Of several queued requests the strongest is the one kept.
   property bool refreshQueued: false
-  property bool refreshQueuedForce: false
+  property string refreshQueuedKind: ""
 
-  function refresh(force) {
+  function refreshRank(kind) {
+    return kind === "force" ? 2 : (kind === "timer" ? 1 : 0)
+  }
+
+  function refresh(kind) {
+    var k = kind === true ? "force" : String(kind || "")
     if (dataProc.running) {
+      if (!refreshQueued || refreshRank(k) > refreshRank(refreshQueuedKind))
+        refreshQueuedKind = k
       refreshQueued = true
-      if (force === true) refreshQueuedForce = true
       return
     }
     loading = true
     dataProc.command = [scriptPath, "--team", team,
-      "--max-age", force === true ? "0" : String(refreshMinutes * 60)]
+      "--max-age", String(Model.cacheMaxAge(refreshMinutes, k))]
     dataProc.running = true
   }
 
   function drainQueuedRefresh() {
     if (!refreshQueued) return
     refreshQueued = false
-    var force = refreshQueuedForce
-    refreshQueuedForce = false
-    Qt.callLater(function() { root.refresh(force) })
+    var kind = refreshQueuedKind
+    refreshQueuedKind = ""
+    Qt.callLater(function() { root.refresh(kind) })
   }
 
   function forceRefresh() {
     dataProc.running = false
-    refresh(true)
+    refresh("force")
   }
 
   // Hung off the poll rather than off anything on screen. A bar widget gets
@@ -298,13 +307,19 @@ Panel {
   }
 
   // A live game moves fast; everything else can wait out the full interval.
+  // The start-up tick is no timer tick: a shell restart may reuse any cache
+  // younger than a full interval instead of fetching again.
   Timer {
     id: refreshTimer
+    property bool ticked: false
     interval: (root.live ? 1 : root.refreshMinutes) * 60000
     running: true
     repeat: true
     triggeredOnStart: true
-    onTriggered: root.refresh(root.live ? true : false)
+    onTriggered: {
+      root.refresh(root.live ? "force" : (ticked ? "timer" : ""))
+      ticked = true
+    }
   }
 
   // Drives the countdown without re-fetching anything.
