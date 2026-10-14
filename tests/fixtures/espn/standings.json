@@ -1,0 +1,218 @@
+{
+ "children": [
+  {
+   "name": "National Football Conference",
+   "children": [
+    {
+     "name": "NFC West",
+     "standings": {
+      "entries": [
+       {
+        "team": {
+         "abbreviation": "SF",
+         "displayName": "San Francisco 49ers",
+         "shortDisplayName": "49ers"
+        },
+        "stats": [
+         {
+          "name": "wins",
+          "value": 5,
+          "displayValue": "5"
+         },
+         {
+          "name": "losses",
+          "value": 0,
+          "displayValue": "0"
+         },
+         {
+          "name": "ties",
+          "value": 0,
+          "displayValue": "0"
+         },
+         {
+          "name": "overall",
+          "displayValue": "5-0"
+         },
+         {
+          "name": "winPercent",
+          "value": 1.0,
+          "displayValue": "1.000"
+         },
+         {
+          "name": "playoffSeed",
+          "value": 1,
+          "displayValue": "1"
+         }
+        ]
+       },
+       {
+        "team": {
+         "abbreviation": "SEA",
+         "displayName": "Seattle Seahawks",
+         "shortDisplayName": "Seahawks"
+        },
+        "stats": [
+         {
+          "name": "wins",
+          "value": 3,
+          "displayValue": "3"
+         },
+         {
+          "name": "losses",
+          "value": 2,
+          "displayValue": "2"
+         },
+         {
+          "name": "ties",
+          "value": 0,
+          "displayValue": "0"
+         },
+         {
+          "name": "overall",
+          "displayValue": "3-2"
+         },
+         {
+          "name": "winPercent",
+          "value": 0.6,
+          "displayValue": "0.600"
+         },
+         {
+          "name": "playoffSeed",
+          "value": 5,
+          "displayValue": "5"
+         }
+        ]
+       },
+       {
+        "team": {
+         "abbreviation": "LAR",
+         "displayName": "Los Angeles Rams",
+         "shortDisplayName": "Rams"
+        },
+        "stats": [
+         {
+          "name": "wins",
+          "value": 2,
+          "displayValue": "2"
+         },
+         {
+          "name": "losses",
+          "value": 3,
+          "displayValue": "3"
+         },
+         {
+          "name": "ties",
+          "value": 0,
+          "displayValue": "0"
+         },
+         {
+          "name": "overall",
+          "displayValue": "2-3"
+         },
+         {
+          "name": "winPercent",
+          "value": 0.4,
+          "displayValue": "0.400"
+         },
+         {
+          "name": "playoffSeed",
+          "value": 9,
+          "displayValue": "9"
+         }
+        ]
+       },
+       {
+        "team": {
+         "abbreviation": "ARI",
+         "displayName": "Arizona Cardinals",
+         "shortDisplayName": "Cardinals"
+        },
+        "stats": [
+         {
+          "name": "wins",
+          "value": 1,
+          "displayValue": "1"
+         },
+         {
+          "name": "losses",
+          "value": 4,
+          "displayValue": "4"
+         },
+         {
+          "name": "ties",
+          "value": 0,
+          "displayValue": "0"
+         },
+         {
+          "name": "overall",
+          "displayValue": "1-4"
+         },
+         {
+          "name": "winPercent",
+          "value": 0.2,
+          "displayValue": "0.200"
+         },
+         {
+          "name": "playoffSeed",
+          "value": 14,
+          "displayValue": "14"
+         }
+        ]
+       }
+      ]
+     }
+    }
+   ]
+  },
+  {
+   "name": "American Football Conference",
+   "children": [
+    {
+     "name": "AFC West",
+     "standings": {
+      "entries": [
+       {
+        "team": {
+         "abbreviation": "KC",
+         "displayName": "Kansas City Chiefs",
+         "shortDisplayName": "Chiefs"
+        },
+        "stats": [
+         {
+          "name": "wins",
+          "value": 4,
+          "displayValue": "4"
+         },
+         {
+          "name": "losses",
+          "value": 1,
+          "displayValue": "1"
+         },
+         {
+          "name": "ties",
+          "value": 0,
+          "displayValue": "0"
+         },
+         {
+          "name": "overall",
+          "displayValue": "4-1"
+         },
+         {
+          "name": "winPercent",
+          "value": 0.8,
+          "displayValue": "0.800"
+         },
+         {
+          "name": "playoffSeed",
+          "value": 1,
+          "displayValue": "1"
+         }
+        ]
+       }
+      ]
+     }
+    }
+   ]
+  }
+ ]
+}

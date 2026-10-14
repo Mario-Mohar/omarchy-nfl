@@ -122,7 +122,7 @@ pip install pytest ruff
 
 python3 .github/scripts/check_plugin.py   # manifest.json and textFormat
 ruff check .                              # Python lint
-pytest tests/ -v                          # tests
+pytest tests/ -v                          # tests (Model.js ones need node)
 shellcheck install uninstall              # shell scripts
 ```
 

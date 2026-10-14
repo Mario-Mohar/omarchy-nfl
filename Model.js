@@ -224,13 +224,43 @@ function played(data) {
   return out
 }
 
+// Only a game that has not started or is under way is still to come. ESPN
+// reports a cancelled or postponed game as state "post" without `completed`,
+// so "not completed" alone would keep a long-gone fixture as the next game.
+function isPending(game) {
+  return !!game && !game.completed && (game.state === "pre" || game.state === "in")
+}
+
+// Over but never played to a result: "Canceled", "Postponed" and the like.
+function isAbandoned(game) {
+  return !!game && !game.completed && game.state === "post"
+}
+
 function upcoming(data) {
   var games = (data && data.games) || []
   var out = []
   for (var i = 0; i < games.length; i++) {
-    if (!games[i].completed) out.push(games[i])
+    if (isPending(games[i])) out.push(games[i])
   }
   return out
+}
+
+// The results list: played games plus the abandoned ones, so a cancelled
+// fixture is shown for what it was. The record and lastGame() stay on played().
+function results(data) {
+  var games = (data && data.games) || []
+  var out = []
+  for (var i = 0; i < games.length; i++) {
+    if (games[i].completed || isAbandoned(games[i])) out.push(games[i])
+  }
+  return out
+}
+
+// The score of a result row, or ESPN's word for why there is none.
+function resultScoreLine(game) {
+  if (!game) return ""
+  if (isAbandoned(game)) return String(game.shortDetail || game.detail || game.description || "")
+  return scoreLine(game)
 }
 
 function liveGame(data) {
@@ -324,6 +354,20 @@ function limited(list, count) {
   if (isNaN(max) || max < 0) return items
   if (max === 0) return []
   return items.length <= max ? items : items.slice(0, max)
+}
+
+// ---- Refresh ---------------------------------------------------------------
+
+// The --max-age handed to bin/nfl-data. "force" skips the cache. A timer tick
+// takes half the interval: the cache is written a few seconds after the
+// previous tick, so a full interval would find it just young enough and serve
+// it again, doubling the real refresh interval. Anything else (opening the
+// panel, a team change, a shell restart) accepts a full interval's worth.
+function cacheMaxAge(refreshMinutes, kind) {
+  var seconds = Math.max(1, parseInt(refreshMinutes, 10) || 15) * 60
+  if (kind === "force") return 0
+  if (kind === "timer") return Math.floor(seconds / 2)
+  return seconds
 }
 
 // ---- Bar label -----------------------------------------------------------

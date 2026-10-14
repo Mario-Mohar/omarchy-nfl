@@ -1,0 +1,184 @@
+{
+ "events": [
+  {
+   "id": "401770001",
+   "date": "2026-08-09T02:00Z",
+   "shortName": "",
+   "week": {
+    "number": 1,
+    "text": "Week 1"
+   },
+   "competitions": [
+    {
+     "neutralSite": false,
+     "venue": {
+      "fullName": "Levi's Stadium",
+      "address": {
+       "city": "Santa Clara"
+      }
+     },
+     "status": {
+      "type": {
+       "id": "3",
+       "name": "STATUS_FINAL",
+       "state": "post",
+       "completed": true,
+       "description": "Final",
+       "detail": "Final",
+       "shortDetail": "Final"
+      },
+      "period": 4,
+      "displayClock": "0:00"
+     },
+     "competitors": [
+      {
+       "homeAway": "away",
+       "team": {
+        "id": "25",
+        "abbreviation": "SF",
+        "displayName": "San Francisco 49ers",
+        "shortDisplayName": "49ers"
+       },
+       "score": {
+        "value": 24.0,
+        "displayValue": "24"
+       }
+      },
+      {
+       "homeAway": "home",
+       "team": {
+        "abbreviation": "LV",
+        "displayName": "Las Vegas Raiders",
+        "shortDisplayName": "Raiders"
+       },
+       "score": {
+        "value": 17.0,
+        "displayValue": "17"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "401770002",
+   "date": "2026-08-17T02:00Z",
+   "shortName": "",
+   "week": {
+    "number": 2,
+    "text": "Week 2"
+   },
+   "competitions": [
+    {
+     "neutralSite": false,
+     "venue": {
+      "fullName": "Levi's Stadium",
+      "address": {
+       "city": "Santa Clara"
+      }
+     },
+     "status": {
+      "type": {
+       "id": "3",
+       "name": "STATUS_FINAL",
+       "state": "post",
+       "completed": true,
+       "description": "Final",
+       "detail": "Final",
+       "shortDetail": "Final"
+      },
+      "period": 4,
+      "displayClock": "0:00"
+     },
+     "competitors": [
+      {
+       "homeAway": "home",
+       "team": {
+        "id": "25",
+        "abbreviation": "SF",
+        "displayName": "San Francisco 49ers",
+        "shortDisplayName": "49ers"
+       },
+       "score": {
+        "value": 13.0,
+        "displayValue": "13"
+       }
+      },
+      {
+       "homeAway": "away",
+       "team": {
+        "abbreviation": "LAC",
+        "displayName": "Los Angeles Chargers",
+        "shortDisplayName": "Chargers"
+       },
+       "score": {
+        "value": 20.0,
+        "displayValue": "20"
+       }
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "id": "401770003",
+   "date": "2026-08-24T20:00Z",
+   "shortName": "",
+   "week": {
+    "number": 3,
+    "text": "Week 3"
+   },
+   "competitions": [
+    {
+     "neutralSite": false,
+     "venue": {
+      "fullName": "Levi's Stadium",
+      "address": {
+       "city": "Santa Clara"
+      }
+     },
+     "status": {
+      "type": {
+       "id": "3",
+       "name": "STATUS_FINAL",
+       "state": "post",
+       "completed": true,
+       "description": "Final",
+       "detail": "Final",
+       "shortDetail": "Final"
+      },
+      "period": 4,
+      "displayClock": "0:00"
+     },
+     "competitors": [
+      {
+       "homeAway": "home",
+       "team": {
+        "id": "25",
+        "abbreviation": "SF",
+        "displayName": "San Francisco 49ers",
+        "shortDisplayName": "49ers"
+       },
+       "score": {
+        "value": 27.0,
+        "displayValue": "27"
+       }
+      },
+      {
+       "homeAway": "away",
+       "team": {
+        "abbreviation": "DEN",
+        "displayName": "Denver Broncos",
+        "shortDisplayName": "Broncos"
+       },
+       "score": {
+        "value": 10.0,
+        "displayValue": "10"
+       }
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}
