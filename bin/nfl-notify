@@ -46,9 +46,10 @@ def clean_id(value):
 
 
 def clean_text(value):
-    # notify-send takes these as arguments, never through a shell, so the only
-    # thing worth bounding here is the length.
-    return " ".join(str(value or "").split())[:MAX_TEXT]
+    # notify-send takes these as arguments, never through a shell. notify()
+    # ends the options with "--", and a leading dash is dropped as well, so
+    # text from ESPN can never be read as an option such as --hint.
+    return " ".join(str(value or "").split()).lstrip("-").strip()[:MAX_TEXT]
 
 
 def load_state(dir_fd):
@@ -109,7 +110,7 @@ def notify(title, body):
     if not title:
         return
     try:
-        subprocess.run(["notify-send", "--app-name", "NFL", title, body],
+        subprocess.run(["notify-send", "--app-name", "NFL", "--", title, body],
                        timeout=10, check=False)
     except (OSError, subprocess.SubprocessError):
         # No libnotify, or no notification daemon running. A widget that shows

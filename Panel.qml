@@ -211,7 +211,10 @@ Panel {
 
   property bool pickingTeam: false
   property int teamIndex: 0
-  readonly property var filteredTeams: Model.filterTeams(teams, teamField.text)
+  // What the search field holds. The field itself only exists while the
+  // picker is open (see teamFieldLoader), so the filter reads this instead.
+  property string teamQuery: ""
+  readonly property var filteredTeams: Model.filterTeams(teams, teamQuery)
 
   function loadTeams() {
     if (teams.length > 0 || teamsProc.running) return
@@ -221,17 +224,19 @@ Panel {
 
   function startPickingTeam() {
     loadTeams()
+    teamQuery = ""
     pickingTeam = true
     teamIndex = 0
-    Qt.callLater(function() {
-      teamField.text = ""
-      teamField.forceActiveFocus()
-    })
   }
+
+  // Leaving the panel by clicking elsewhere does not go through close(), and
+  // the search field must not outlive the panel (see teamFieldLoader).
+  onOpenedChanged: if (!opened && pickingTeam) cancelPickingTeam()
 
   function cancelPickingTeam() {
     pickingTeam = false
     teamIndex = 0
+    teamQuery = ""
     Qt.callLater(function() { if (keyCatcher) keyCatcher.forceActiveFocus() })
   }
 
@@ -410,7 +415,7 @@ Panel {
                 // the field overlaps the hint line beneath it.
                 Item {
                   width: parent.width
-                  height: root.pickingTeam ? teamField.implicitHeight : teamNameText.implicitHeight
+                  height: root.pickingTeam ? teamFieldLoader.implicitHeight : teamNameText.implicitHeight
 
                   Text {
                     textFormat: Text.PlainText
@@ -436,30 +441,44 @@ Panel {
                     onClicked: root.startPickingTeam()
                   }
 
-                  TextField {
-                    id: teamField
-                    visible: root.pickingTeam
+                  // Only created while the picker is open. An editable field
+                  // that merely sits hidden still makes Qt read every
+                  // clipboard change, which a hostile clipboard owner could
+                  // use to stall the shell.
+                  Loader {
+                    id: teamFieldLoader
+                    active: root.pickingTeam
                     width: parent.width
-                    placeholderText: Model.t("searchTeam")
-                    foreground: root.bar ? root.bar.foreground : Color.foreground
-                    font.family: root.bar ? root.bar.fontFamily : Style.font.family
 
-                    onTextChanged: root.teamIndex = 0
+                    sourceComponent: TextField {
+                      id: teamField
+                      width: teamFieldLoader.width
+                      placeholderText: Model.t("searchTeam")
+                      foreground: root.bar ? root.bar.foreground : Color.foreground
+                      font.family: root.bar ? root.bar.fontFamily : Style.font.family
 
-                    Keys.onPressed: function(event) {
-                      if (event.key === Qt.Key_Escape) {
-                        root.cancelPickingTeam()
-                        event.accepted = true
-                      } else if (event.key === Qt.Key_Down) {
-                        root.moveTeamIndex(1)
-                        event.accepted = true
-                      } else if (event.key === Qt.Key_Up) {
-                        root.moveTeamIndex(-1)
-                        event.accepted = true
-                      } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
-                        root.commitTeam()
-                        event.accepted = true
+                      onTextChanged: {
+                        root.teamQuery = text
+                        root.teamIndex = 0
                       }
+
+                      Keys.onPressed: function(event) {
+                        if (event.key === Qt.Key_Escape) {
+                          root.cancelPickingTeam()
+                          event.accepted = true
+                        } else if (event.key === Qt.Key_Down) {
+                          root.moveTeamIndex(1)
+                          event.accepted = true
+                        } else if (event.key === Qt.Key_Up) {
+                          root.moveTeamIndex(-1)
+                          event.accepted = true
+                        } else if (event.key === Qt.Key_Return || event.key === Qt.Key_Enter) {
+                          root.commitTeam()
+                          event.accepted = true
+                        }
+                      }
+
+                      Component.onCompleted: forceActiveFocus()
                     }
                   }
                 }
