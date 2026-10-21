@@ -9,6 +9,7 @@ import importlib.util
 import json
 import os
 import sys
+import time
 import urllib.error
 from pathlib import Path
 
@@ -138,3 +139,37 @@ def test_failed_first_request_serves_the_stale_cache(espn, monkeypatch, capsys, 
     assert code == 0
     assert len(data["games"]) == 19
     assert cache.read_text() == good
+
+
+def test_get_gives_up_on_a_response_that_trickles(monkeypatch):
+    """Each byte arrives well inside the socket timeout; the whole never ends."""
+    import socket
+    import threading
+
+    listener = socket.socket()
+    listener.bind(("127.0.0.1", 0))
+    listener.listen(1)
+    stop = threading.Event()
+
+    def trickle():
+        conn, _ = listener.accept()
+        try:
+            conn.sendall(b"HTTP/1.1 200 OK\r\nContent-Length: 100000\r\n\r\n")
+            while not stop.is_set():
+                conn.sendall(b" ")
+                time.sleep(0.1)
+        except OSError:
+            pass
+        finally:
+            conn.close()
+
+    threading.Thread(target=trickle, daemon=True).start()
+    monkeypatch.setattr(nfl_data, "REQUEST_DEADLINE", 1)
+    started = time.monotonic()
+    try:
+        with pytest.raises(nfl_data.FETCH_ERRORS):
+            nfl_data.get("http://127.0.0.1:%d/" % listener.getsockname()[1])
+    finally:
+        stop.set()
+        listener.close()
+    assert time.monotonic() - started < 5

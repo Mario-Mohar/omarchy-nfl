@@ -296,6 +296,23 @@ Panel {
     }
   }
 
+  // Last line of defence behind nfl-data's own per-request deadline: a run
+  // that is still going after this long is stuck, and as long as it runs no
+  // queued refresh can start. Stopping it lets the queue drain again.
+  Timer {
+    interval: 120000
+    running: dataProc.running
+    repeat: false
+    onTriggered: dataProc.running = false
+  }
+
+  Timer {
+    interval: 120000
+    running: teamsProc.running
+    repeat: false
+    onTriggered: teamsProc.running = false
+  }
+
   Process {
     id: teamsProc
     stdout: StdioCollector {
