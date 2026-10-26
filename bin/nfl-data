@@ -90,6 +90,18 @@ def _deadline_passed(_signum, _frame):
     raise TimeoutError("ESPN request took longer than %d s" % REQUEST_DEADLINE)
 
 
+class _NoRedirect(urllib.request.HTTPRedirectHandler):
+    # The ESPN endpoints answer directly. Following a redirect would let urllib
+    # drain the redirect body with an unbounded read() before our byte cap ever
+    # sees it, so refuse instead: the 3xx surfaces as an HTTPError (a URLError)
+    # with its body unread, and the caller falls back to the cache.
+    def redirect_request(self, req, fp, code, msg, headers, newurl):
+        return None
+
+
+_opener = urllib.request.build_opener(_NoRedirect)
+
+
 def get(url):
     # ESPN 403s unknown and browser-like agents alike; a curl UA is accepted.
     #
@@ -100,7 +112,7 @@ def get(url):
     previous = signal.signal(signal.SIGALRM, _deadline_passed)
     signal.setitimer(signal.ITIMER_REAL, REQUEST_DEADLINE)
     try:
-        with urllib.request.urlopen(req, timeout=TIMEOUT) as resp:
+        with _opener.open(req, timeout=TIMEOUT) as resp:
             return nflcommon.load_json_bounded(resp)
     finally:
         signal.setitimer(signal.ITIMER_REAL, 0)

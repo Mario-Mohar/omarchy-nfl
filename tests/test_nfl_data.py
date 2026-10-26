@@ -173,3 +173,45 @@ def test_get_gives_up_on_a_response_that_trickles(monkeypatch):
         stop.set()
         listener.close()
     assert time.monotonic() - started < 5
+
+
+def test_get_refuses_redirects_without_reading_the_body(monkeypatch):
+    """A 302 with an endless body must fail fast instead of being drained."""
+    import socket
+    import threading
+
+    listener = socket.socket()
+    listener.bind(("127.0.0.1", 0))
+    listener.listen(1)
+    stop = threading.Event()
+    sent = []
+
+    def redirect():
+        conn, _ = listener.accept()
+        try:
+            conn.sendall(
+                b"HTTP/1.1 302 Found\r\nLocation: http://127.0.0.1:1/\r\n"
+                b"Content-Length: 1000000000\r\n\r\n"
+            )
+            chunk = b"x" * 65536
+            while not stop.is_set():
+                conn.sendall(chunk)
+                sent.append(len(chunk))
+        except OSError:
+            pass
+        finally:
+            conn.close()
+
+    threading.Thread(target=redirect, daemon=True).start()
+    started = time.monotonic()
+    try:
+        with pytest.raises(urllib.error.HTTPError) as err:
+            nfl_data.get("http://127.0.0.1:%d/" % listener.getsockname()[1])
+        assert err.value.code == 302
+        err.value.close()
+    finally:
+        stop.set()
+        listener.close()
+    assert time.monotonic() - started < 5
+    # Only what the socket buffers took before the client gave up, not the body.
+    assert sum(sent) < 50 * 1024 * 1024
