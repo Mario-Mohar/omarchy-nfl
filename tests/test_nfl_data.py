@@ -215,3 +215,12 @@ def test_get_refuses_redirects_without_reading_the_body(monkeypatch):
     assert time.monotonic() - started < 5
     # Only what the socket buffers took before the client gave up, not the body.
     assert sum(sent) < 50 * 1024 * 1024
+
+
+@pytest.mark.parametrize("value, expected", [
+    (1, 1), (18, 18), (nfl_data.MAX_WEEK, nfl_data.MAX_WEEK),
+    (0, 0), (-3, 0), (nfl_data.MAX_WEEK + 1, 0), (1000000000, 0),
+    ("5", 0), (5.0, 0), (True, 0), (None, 0), ([1], 0),
+])
+def test_week_number_keeps_only_plausible_weeks(value, expected):
+    assert nfl_data.week_number(value) == expected

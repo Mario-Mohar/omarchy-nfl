@@ -30,7 +30,7 @@ process.stdout.write(JSON.stringify(result === undefined ? null : result));
 """
 
 EXPORTS = ["upcoming", "results", "played", "nextGame", "lastGame", "regularRecordLabel",
-           "resultScoreLine", "tooltipText", "barLabel", "cacheMaxAge"]
+           "resultScoreLine", "tooltipText", "barLabel", "cacheMaxAge", "byeWeeks"]
 
 
 def model(fn, *args):
@@ -105,3 +105,18 @@ def test_timer_max_age_is_below_the_interval(minutes):
 def test_force_skips_the_cache_and_a_plain_refresh_takes_a_full_interval():
     assert model("cacheMaxAge", 15, "force") == 0
     assert model("cacheMaxAge", 15, "") == 900
+
+
+def _regular(week):
+    return {"seasonType": 2, "week": week}
+
+
+def test_bye_weeks_finds_the_gap():
+    games = [_regular(w) for w in range(1, 19) if w != 9]
+    assert model("byeWeeks", {"games": games}) == [9]
+
+
+def test_bye_weeks_ignores_an_absurd_week_number():
+    """A huge week from a stale cache must not drive the loop."""
+    games = [_regular(1), _regular(3), _regular(1000000000), _regular("1e9")]
+    assert model("byeWeeks", {"games": games}) == [2]
