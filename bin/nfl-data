@@ -162,6 +162,19 @@ def score_of(competitor):
         return None
 
 
+# The longest NFL phase is the regular season, 18 weeks since 2021. Anything
+# past this is not a real week number, and the panel loops up to the largest
+# week it sees, so it must never get a huge one.
+MAX_WEEK = 25
+
+
+def week_number(value):
+    """ESPN's week number if it is a plausible one, otherwise 0 (unknown)."""
+    if isinstance(value, bool) or not isinstance(value, int):
+        return 0
+    return value if 1 <= value <= MAX_WEEK else 0
+
+
 def parse_event(event, team_abbr, stype_id, stype_name, stype_abbr):
     comps = event.get("competitions") or []
     if not comps:
@@ -207,7 +220,7 @@ def parse_event(event, team_abbr, stype_id, stype_name, stype_abbr):
         "seasonType": stype_id,
         "seasonTypeName": stype_name,
         "seasonTypeAbbr": stype_abbr,
-        "week": week.get("number") or 0,
+        "week": week_number(week.get("number")),
         "weekText": week.get("text") or "",
         "shortName": event.get("shortName") or "",
         "homeAway": me.get("homeAway") or "",

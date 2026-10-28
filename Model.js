@@ -309,7 +309,10 @@ function regularRecordLabel(data) {
 }
 
 // Regular-season weeks with no game on the calendar. 2026 runs 18 weeks for
-// 17 games, so exactly one bye falls out of this.
+// 17 games, so exactly one bye falls out of this. nfl-data already drops
+// implausible week numbers; the cap here also covers an older cache.
+var MAX_REGULAR_WEEK = 25
+
 function byeWeeks(data) {
   var games = (data && data.games) || []
   var seen = {}
@@ -317,7 +320,7 @@ function byeWeeks(data) {
   for (var i = 0; i < games.length; i++) {
     if (games[i].seasonType !== 2) continue
     var w = parseInt(games[i].week, 10)
-    if (!w) continue
+    if (!(w >= 1 && w <= MAX_REGULAR_WEEK)) continue
     seen[w] = true
     if (w > maxWeek) maxWeek = w
   }
